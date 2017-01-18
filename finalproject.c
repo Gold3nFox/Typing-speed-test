@@ -26,6 +26,22 @@ struct linkedlist
 	struct linkedlist * next;
 };
 
+struct scoreboard
+{
+	char * name;
+	float * score;
+};
+
+void structswapper(struct scoreboard * one,struct scoreboard * two)
+{
+	struct scoreboard tmp;
+	tmp.name = one -> name;
+	tmp.score = one -> score;
+	one -> name = two -> name;
+	one -> score = two -> score;
+	two -> name = tmp.name;
+	two -> score = tmp.score;
+}
 void addend(struct linkedlist **list,char * value, int length)
 {
 	struct linkedlist *current;
@@ -203,7 +219,7 @@ void randomshuffle(struct linkedlist **nn,int a)
 
 float scorecalculator(int time,int wrongword,int wordnum)
 {
-	float score = (3*wordnum - wrongword )/ time;
+	float score = (3 * wordnum - wrongword ) / time;
 	return (score / wordnum) ;
 }
 
@@ -212,39 +228,73 @@ void scoreboard(float score,char * esm)
 	FILE *fp;
 	if (!(fp = fopen("scoreboard.txt", "a+"))) {
         printf("Failed to open FILE\n");
-        return -1;
+        return;
     }
     float savedscore;
-	char * esmtmp;
-	esmtmp = (char *)malloc(20 * sizeof(char));
-    while (!feof(fp))
-    {
-		fscanf(fp, "%s %f", esmtmp, &savedscore);
-		if(strcmp(esm, esmtmp) == 0)
-		{
-			//age ghablan to scoreboard bode
-		}
-	}
+	char * esmtmp[10];
+	for(int i = 0; i< 10 ; i++)
+		esmtmp[i] = (char *)malloc(sizeof(char *));
+    
 }
 
-int isinscoreboard(char * esm)
+int isinscoreboard(char * esm,float newscore)
 {
+	struct scoreboard top10[10];
 	FILE *fp;
-	if (!(fp = fopen("scoreboard.txt", "a+"))) {
+	if (!(fp = fopen("scoreboard.txt", "r+"))) {
         printf("Failed to open FILE\n");
         return -1;
     }
-    float savedscore;
-	char * esmtmp;
-	esmtmp = (char *)malloc(20 * sizeof(char));
+    float savedscore[10];
+	char * esmtmp[10];
+	char * name;
+	for(int i = 0; i< 10 ; i++)
+	{
+		esmtmp[i] = (char *)malloc(sizeof(char *));
+		top10[i].name = (char *)malloc(20 *sizeof(char));
+		top10[i].score = (float *)malloc(sizeof(float));
+	}
+	int i = 0 ;
     while (!feof(fp))
     {
-		fscanf(fp, "%s %f", esmtmp, &savedscore);
-		if(strcmp(esm, esmtmp) == 0)
+		fscanf(fp, "%s %f", top10[i].name, top10[i].score);
+		i++;
+	}
+	for (int j = 0; j < 10; ++j)
+	{
+		for (int i = 0; i < 9; ++i)
 		{
-			return 1;
+			if(*(top10[i].score) < *(top10[i+1].score))
+			{
+				structswapper(&top10[i],&top10[i+1]);
+			}
 		}
 	}
+	if(newscore > *(top10[9].score))
+	{
+		top10[9].score = &newscore;
+		top10[9].name = esm;
+	}
+	for (int j = 0; j < 10; ++j)
+	{
+		for (int i = 0; i < 9; ++i)
+		{
+			if(*(top10[i].score) < *(top10[i+1].score))
+			{
+				structswapper(&top10[i],&top10[i+1]);
+			}
+		}
+	}
+	fclose(fp);
+	if (!(fp = fopen("scoreboard.txt", "w+"))) {
+        printf("Failed to open FILE\n");
+        return -1;
+    }
+	for (int i = 0; i < 10; ++i)
+	{
+		 fprintf(fp, "%s %f \n",top10[i].name,*(top10[i].score));
+	}
+	return 0;
 }
 
 int main(void)
@@ -253,15 +303,8 @@ int main(void)
 	struct linkedlist * nn;
 	nn = NULL;
 	levelopener(3,&nn);
-	// char * str1 = "salam";
-	// char * str2 = "chetori";
-	// char * str3 = "khoobam";
-	// int i = save(str2,5);
-	// printf("%d\n", i);
-	// i = save(str3,6);
-	// printf("%d\n", i);
-	// i = save(str1,3);
-	// printf("%d\n", i);
+	char * str1 = "salam";
 	randomshuffle(&nn,3);
+	printf("%d---<>",isinscoreboard(str1,400000));
 	return 0;
 }
