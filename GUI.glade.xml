@@ -6,7 +6,6 @@
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
     <property name="type_hint">dialog</property>
-    <signal name="close" handler="dialog_closer" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkVBox" id="dialog-vbox1">
         <property name="visible">True</property>
@@ -48,7 +47,7 @@
           </packing>
         </child>
         <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="dialog_action_area1">
+          <object class="GtkHButtonBox" id="dialog-action_area1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="layout_style">center</property>
@@ -58,7 +57,6 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <signal name="clicked" handler="start_clicked" object="label3" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -115,7 +113,7 @@
         <property name="can_focus">False</property>
         <property name="spacing">2</property>
         <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="dialog_action_area2">
+          <object class="GtkHButtonBox" id="dialog-action_area2">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
@@ -198,7 +196,7 @@
         <property name="can_focus">False</property>
         <property name="spacing">2</property>
         <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="dialog_action_area">
+          <object class="GtkHButtonBox" id="dialog-action_area">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
@@ -532,8 +530,6 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <signal name="clicked" handler="level1_clicked" object="entry1" swapped="no"/>
-                    <signal name="pressed" handler="level1_pressed" object="label3" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -547,8 +543,6 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <signal name="clicked" handler="level2_clicked" object="entry1" swapped="no"/>
-                    <signal name="pressed" handler="level2_pressed" object="label3" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -562,8 +556,6 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <signal name="clicked" handler="level3_clicked" object="entry1" swapped="no"/>
-                    <signal name="pressed" handler="level3_pressed" object="label3" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -577,8 +569,6 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <signal name="clicked" handler="level4_clicked" object="entry1" swapped="no"/>
-                    <signal name="pressed" handler="level4_pressed" object="label3" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -592,8 +582,6 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <signal name="clicked" handler="level5_clicked" object="entry1" swapped="no"/>
-                    <signal name="pressed" handler="level5_pressed" object="label3" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -607,8 +595,6 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <signal name="clicked" handler="level6_clicked" object="entry1" swapped="no"/>
-                    <signal name="pressed" handler="level6_pressed" object="label3" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -622,8 +608,6 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <signal name="clicked" handler="level7_clicked" object="entry1" swapped="no"/>
-                    <signal name="pressed" handler="level7_pressed" object="label3" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -637,8 +621,6 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <signal name="clicked" handler="level8_clicked" object="entry1" swapped="no"/>
-                    <signal name="pressed" handler="level8_pressed" object="label3" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -652,8 +634,6 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <signal name="clicked" handler="level9_clicked" object="entry1" swapped="no"/>
-                    <signal name="pressed" handler="level9_pressed" object="label3" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -667,8 +647,6 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <signal name="clicked" handler="level10_clicked" object="entry1" swapped="no"/>
-                    <signal name="pressed" handler="level10_pressed" object="label3" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -694,7 +672,7 @@
                       <object class="GtkLabel" id="label1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Level 1</property>
+                        <property name="label" translatable="yes">Level 3</property>
                         <attributes>
                           <attribute name="foreground" value="#071c89bf071c"/>
                         </attributes>
@@ -733,8 +711,7 @@
                       <object class="GtkLabel" id="label3">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="xalign">0.49000000953674316</property>
-                        <property name="label" translatable="yes">start</property>
+                        <property name="label" translatable="yes">HOrse</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -744,10 +721,9 @@
                     </child>
                     <child>
                       <object class="GtkProgressBar" id="progressbar1">
-                        <property name="height_request">60</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                      <!--   <property name="text_yalign">1</property> -->
+                        <!-- <property name="text_yalign">1</property> -->
                         <property name="fraction">0.29999999999999999</property>
                       </object>
                       <packing>
@@ -773,7 +749,6 @@
                     <property name="secondary_icon_activatable">False</property>
                     <property name="primary_icon_sensitive">True</property>
                     <property name="secondary_icon_sensitive">True</property>
-                    <signal name="changed" handler="text_changed" object="label3" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>

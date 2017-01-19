@@ -23,6 +23,7 @@ int getch(void)
 struct linkedlist
 {
 	char * value;
+	int length;
 	struct linkedlist * next;
 };
 
@@ -51,6 +52,7 @@ void addend(struct linkedlist **list,char * value, int length)
 	{
 		*list = (struct linkedlist *)malloc(sizeof(struct linkedlist));
 		((struct linkedlist*)*list) -> value = (char *)malloc(sizeof(length * sizeof(char)));
+		((struct linkedlist*)*list) -> length = length;
 		memcpy(((struct linkedlist*)*list) -> value , value, length);
 		((struct linkedlist*)*list) -> next = NULL;
 		return;
@@ -61,6 +63,7 @@ void addend(struct linkedlist **list,char * value, int length)
 	}
 	nn = (struct linkedlist *)malloc(sizeof(struct linkedlist));
 	nn -> value = (char *)malloc(sizeof(length * sizeof(char)));
+	nn -> length = length;
 	current -> next = nn;
 	nn -> next = NULL;
 	memcpy(nn -> value , value, length);
@@ -295,6 +298,12 @@ int isinscoreboard(char * esm,float newscore)
 		 fprintf(fp, "%s %f \n",top10[i].name,*(top10[i].score));
 	}
 	return 0;
+}
+
+void uppermatches (char *str,char *str2)
+{
+	int i = 0;
+
 }
 
 int main(void)
