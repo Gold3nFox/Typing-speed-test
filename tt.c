@@ -7,19 +7,24 @@
 #include <unistd.h>
 #include <termios.h>
 #include <stdbool.h>
-struct linkedlist * nn;
+struct linkedlist * list_of_words;
+char *player_name;
+char * scoreboard_toshow[10];
 bool started=0;
 bool startchecker =0;
 int wordnum = 0;
 int all_chars = 0;
 int word_wrong_chars = 0;
-int level = 0;
-float score = 0,levelscore = 0;
+int level = 1;
+int maxlevel= 1;
+float score = 0,levelscore = 0,player_score = 0;
 GtkHButtonBox * buttonbox;
-GtkDialog *dialog;
-GtkBuilder *builder, *builder_dialog,*builder_dialog_scoreboard;
-GtkWidget *button11,*button12,*label4,*label5,*label7,*label8,*label9,*label10,*label11,*label12,*label13,*label14,*label15,*label16,*messagedialog_scoreboard,*statusbar1,*dialog_newlevel;
+GtkDialog *dialog,*dialog_playername;
+GtkBuilder *builder, *builder_dialog,*builder_dialog_scoreboard,*start_builder;
+GtkWidget *entry2,*button11,*button12,*button13,*label2,*label4,*label5,*label6,*label7,*label8,*label9,*label10,*label11,*label12,*label13,*label14,*label15,*label16,*messagedialog_scoreboard,*statusbar1,*dialog_newlevel;
 clock_t start_t, end_t, total_t;
+// chon nemitonam ro xml bishtar az ye object bedam be eventa baranke dasresi dashte basham global bayad bokonam
+// albate bishtar az ye objectam shayad beshe man chizi peyda nakardam
 struct linkedlist
 {
     char * value;
@@ -45,15 +50,14 @@ void structswapper(struct scoreboard * one,struct scoreboard * two)
 void addend(struct linkedlist **list,char * word, int length)
 {
     struct linkedlist *current;
-    struct linkedlist *nn;
+    struct linkedlist *list_of_words;
     current = *list;
-    length++; // bara nulle akhareshon
+    length++;
     if (current == NULL)
     {
         *list = (struct linkedlist *)malloc(sizeof(struct linkedlist));
         ((struct linkedlist*)*list) -> value = (char *)malloc(sizeof(length * sizeof(char)));
         strncpy(((struct linkedlist*)*list) -> value , word, length);
-        // printf("null-word len: %i", length);
         ((struct linkedlist*)*list) -> next = NULL;
         return;
     }
@@ -61,22 +65,20 @@ void addend(struct linkedlist **list,char * word, int length)
     {
         current = current -> next;
     }
-    nn = (struct linkedlist *)malloc(sizeof(struct linkedlist));
-    nn -> value = (char *)malloc(sizeof(length * sizeof(char)));
-    current -> next = nn;
-    nn -> next = NULL;
-    strncpy(nn -> value , word, length);
-    // printf("word len: %i", length);
-    // printf("-----%s\n", ((struct linkedlist *)nn) -> value);
+    list_of_words = (struct linkedlist *)malloc(sizeof(struct linkedlist));
+    list_of_words -> value = (char *)malloc(sizeof(length * sizeof(char)));
+    current -> next = list_of_words;
+    list_of_words -> next = NULL;
+    strncpy(list_of_words -> value , word, length);
 }
 
 int savedornot(char *esm)
 {
     int i = 0;
     FILE *fp;
-    int level;
-    char * esmtmp;
-    esmtmp = (char *)malloc(20 * sizeof(char));
+    int player_level;
+    char * names_in_file;
+    names_in_file = (char *)malloc(20 * sizeof(char));
     if (!(fp = fopen("save.txt", "rt"))) {
         while(!(fp = fopen("save.txt", "rt")))
         {
@@ -92,10 +94,10 @@ int savedornot(char *esm)
     }
     while (!feof(fp))
     {
-        fscanf(fp, "%s %d", esmtmp, &level);
-        if(strcmp(esm, esmtmp) == 0)
+        fscanf(fp, "%s %d", names_in_file, &player_level);
+        if(strcmp(esm, names_in_file) == 0)
         {
-            return level;
+            return player_level;
         }
     }
     fclose(fp);
@@ -124,7 +126,7 @@ int save(char *esm,int level)
     }
 }
 
-int levelopener(int a,struct linkedlist ** nn)
+int levelopener(int a,struct linkedlist ** list_of_words)
 {
     wordnum = 0;
     int i = 0;
@@ -158,11 +160,11 @@ int levelopener(int a,struct linkedlist ** nn)
             wordnum ++;
             word[i] = '\0';
 
-            addend(nn,word,i);
+            addend(list_of_words,word,i);
             i = 0;
             printf("%s\n",word);
             struct linkedlist *node;
-            node = *nn;
+            node = *list_of_words;
             while(node -> next != NULL)
             {
                 node = node -> next;
@@ -175,13 +177,13 @@ int levelopener(int a,struct linkedlist ** nn)
         return 0;
 }
 
-void randomshuffle(struct linkedlist **nn,int filenumber)
+void randomshuffle(struct linkedlist **list_of_words,int filenumber)
 {
     char * shuffle[wordnum];
     for (int i = 0; i < wordnum; i++)
         shuffle[i] = malloc(sizeof(char *));
     struct linkedlist * current;
-    current = *nn;
+    current = *list_of_words;
     int i = 0;
     while (current != NULL)
     {
@@ -195,7 +197,7 @@ void randomshuffle(struct linkedlist **nn,int filenumber)
       shuffle[i] = shuffle[w];
       shuffle[w] = t;
     }
-    current = *nn;
+    current = *list_of_words;
     for (int i = 0; i < wordnum; ++i)
     {
         current -> value = shuffle[i];
@@ -220,9 +222,9 @@ void scoreboard(float score,char * esm)
         return;
     }
     float savedscore;
-    char * esmtmp[10];
+    char * names_in_file[10];
     for(int i = 0; i< 10 ; i++)
-        esmtmp[i] = (char *)malloc(sizeof(char *));
+        names_in_file[i] = (char *)malloc(sizeof(char *));
     
 }
 
@@ -235,11 +237,11 @@ int isinscoreboard(char * esm,float newscore)
         return -1;
     }
     float savedscore[10];
-    char * esmtmp[10];
+    char * names_in_file[10];
     char * name;
     for(int i = 0; i< 10 ; i++)
     {
-        esmtmp[i] = (char *)malloc(sizeof(char *));
+        names_in_file[i] = (char *)malloc(sizeof(char *));
         top10[i].name = (char *)malloc(20 *sizeof(char));
         top10[i].score = (float *)malloc(sizeof(float));
     }
@@ -274,6 +276,7 @@ int isinscoreboard(char * esm,float newscore)
             }
         }
     }
+
     fclose(fp);
     if (!(fp = fopen("scoreboard.txt", "w+"))) {
         printf("Failed to open FILE\n");
@@ -281,14 +284,23 @@ int isinscoreboard(char * esm,float newscore)
     }
     for (int i = 0; i < 10; ++i)
     {
-         fprintf(fp, "%s %f \n",top10[i].name,*(top10[i].score));
+        fprintf(fp, "%s %.1f \n",top10[i].name,*(top10[i].score));
+        printf("%s %f\n",top10[i].name,*(top10[i].score) );
+    }
+    fclose(fp);
+    for (int i = 0; i < 10; ++i)
+    {
+        scoreboard_toshow[i] = malloc(30*sizeof(char));
+        sprintf(scoreboard_toshow[i],"%.1f",*(top10[i].score));
+        strcat(scoreboard_toshow[i],":");
+        strcat(scoreboard_toshow[i],top10[i].name);
     }
     return 0;
 }
 
 void newlevel_showdialog (void)
 {
-    gtk_widget_show (dialog);
+    gtk_widget_show (GTK_WIDGET(dialog));
 }
 
 void toupperchanged (char * mainstr,char * str2)
@@ -317,7 +329,7 @@ int wrong_chars (char * mainstr,char * str2)
     int len_min = len_main > len_current ? len_current : len_main;
     for (int i = 0; i < len_min; ++i)
     {
-        if (mainstr[i] != str2[i] && str2[i] != ' ' && mainstr != ' ')
+        if (mainstr[i] != str2[i] && str2[i] != ' ' && strcmp(mainstr," ") != 0)
         {
             wrongchars++;
             printf("%s=========%s---->%d\n",mainstr,str2,wrongchars );
@@ -339,16 +351,15 @@ void tolowerchanged (char * str2)
     }
 }
 
-void start_clicked(GtkWidget * button11,GtkWidget * label3)
+void save_clicked(GtkWidget * button12,GtkWidget * label3)
 {
-    if (level < 10)
-    {
-        levelopener(level+1,&nn);
-        randomshuffle(&nn,level+1);
-        gtk_widget_destroy(dialog);
-    }else
-    {
-        gtk_widget_destroy(dialog);
+    isinscoreboard(player_name,player_score);
+    save(player_name,maxlevel);
+    // printf("%s--%f\n",top10[0].name,top10[0].score );
+}
+void show_dialog_scoreboard(void)
+{
+    gtk_widget_destroy(GTK_WIDGET(dialog));
         builder_dialog_scoreboard = gtk_builder_new();
         gtk_builder_add_from_file (builder_dialog_scoreboard, "GUI.glade" , NULL);
         label7 = GTK_WIDGET(gtk_builder_get_object(builder_dialog_scoreboard,"label7"));
@@ -373,19 +384,76 @@ void start_clicked(GtkWidget * button11,GtkWidget * label3)
         gtk_builder_connect_signals(builder_dialog_scoreboard,"label16");
         messagedialog_scoreboard = GTK_WIDGET(gtk_builder_get_object(builder_dialog_scoreboard,"messagedialog_scoreboard"));
         gtk_builder_connect_signals(builder_dialog_scoreboard,"messagedialog_scoreboard");
+        
+        gtk_label_set_text(GTK_LABEL(label7),scoreboard_toshow[0]);
+        gtk_label_set_text(GTK_LABEL(label8),scoreboard_toshow[1]);
+        gtk_label_set_text(GTK_LABEL(label9),scoreboard_toshow[2]);
+        gtk_label_set_text(GTK_LABEL(label10),scoreboard_toshow[3]);
+        gtk_label_set_text(GTK_LABEL(label11),scoreboard_toshow[4]);
+        gtk_label_set_text(GTK_LABEL(label12),scoreboard_toshow[5]);
+        gtk_label_set_text(GTK_LABEL(label13),scoreboard_toshow[6]);
+        gtk_label_set_text(GTK_LABEL(label14),scoreboard_toshow[7]);
+        gtk_label_set_text(GTK_LABEL(label15),scoreboard_toshow[8]);
+        gtk_label_set_text(GTK_LABEL(label16),scoreboard_toshow[9]);
+
+
+
         gtk_dialog_run (GTK_DIALOG (messagedialog_scoreboard));
         g_object_unref(G_OBJECT(builder_dialog_scoreboard));
+}
+void start_clicked(GtkWidget * button11,GtkWidget * label3)
+{
+    if (level < 10)
+    {
+        levelopener(level+1,&list_of_words);
+        randomshuffle(&list_of_words,level+1);
+        gtk_widget_destroy(GTK_WIDGET(dialog));
+        level++;
+        if (level > maxlevel) maxlevel = level;
+    }else
+    {
+        show_dialog_scoreboard();
     }
+}
+
+void game_start(void)
+{
+	start_builder = gtk_builder_new();
+	gtk_builder_add_from_file(start_builder, "GUI.glade" , NULL);
+	button13 = GTK_WIDGET(gtk_builder_get_object(start_builder,"button13"));
+    gtk_builder_connect_signals(start_builder,"button13");
+    dialog_playername = GTK_DIALOG(gtk_builder_get_object(start_builder,"dialog_playername"));
+    gtk_builder_connect_signals(start_builder,"dialog_playername");
+    label6 = GTK_LABEL(gtk_builder_get_object(start_builder,"label6"));
+    gtk_builder_connect_signals(start_builder,"label6");
+    entry2 = GTK_WIDGET(gtk_builder_get_object(start_builder,"entry2"));
+    gtk_builder_connect_signals(start_builder,"entry2");
+    gtk_entry_set_max_length (entry2,14);
+
+    gtk_widget_show (GTK_WIDGET(dialog_playername));
+
+
+}
+void name_clicked (GtkWidget * button13 , GtkWidget * entry2)
+{
+	player_name = malloc(15*sizeof(char));
+	printf("alo\n");
+	player_name = (gchar *)(gtk_entry_get_text(GTK_ENTRY(entry2)));
+	printf("%s-------\n",player_name);
+	printf("%s kkkkkdkkdkd\n",player_name );
+    gtk_label_set_text(label2,player_name);
+	gtk_widget_hide (dialog_playername);
+
 }
 
 void text_changed(GtkWidget *entry1, GtkWidget *label3){
     char *score_to_string;
-    const gchar * input;
+    gchar * input;
     gchar * labelvalue;
     char *emptystring;
-    input = gtk_entry_get_text (GTK_ENTRY(entry1));
-    labelvalue = gtk_label_get_text (label3);
-    int len_main = strlen(nn -> value);
+    input = (gchar *)(gtk_entry_get_text (GTK_ENTRY(entry1)));
+    labelvalue = (gchar *)(gtk_label_get_text (GTK_LABEL(label3)));
+    int len_main = strlen(list_of_words -> value);
     char * lastword = malloc(strlen(labelvalue)*sizeof(char));
     char * matched_entry_to_upper = malloc(strlen(labelvalue)*sizeof(char));
     if(strcmp(input,"start ") == 0)
@@ -411,7 +479,7 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
     {
         if(input[strlen(input)-1] == ' ')
         {
-            if (nn -> next == NULL )
+            if (list_of_words -> next == NULL )
             {
                 word_wrong_chars = 0;
                 all_chars = 0;
@@ -429,7 +497,7 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
                 gtk_builder_connect_signals(builder_dialog,"label5");
                 statusbar1 = GTK_WIDGET(gtk_builder_get_object(builder_dialog,"statusbar1"));
                 gtk_builder_connect_signals(builder_dialog,"statusbar1");
-                dialog = GTK_WIDGET(gtk_builder_get_object(builder_dialog,"dialog_newlevel"));
+                dialog = GTK_DIALOG(gtk_builder_get_object(builder_dialog,"dialog_newlevel"));
                 gtk_builder_connect_signals(builder_dialog,"dialog_newlevel");   
                 printf("%f>>>>>>>>>\n", levelscore);
                 levelscore = levelscore / wordnum;
@@ -437,9 +505,14 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
                 score_to_string = malloc(13*sizeof(char));
                 sprintf(score_to_string,"%.3f",levelscore);
                 strcat(score_to_string,":score");
-                gtk_label_set_text (label5,score_to_string);
+                gtk_label_set_text (GTK_LABEL(label5),score_to_string);
 
-                gtk_entry_set_text (entry1,"");
+
+                player_score += levelscore;
+                printf("%f==========%f====scores\n",levelscore,player_score);
+                levelscore = 0;
+
+                gtk_entry_set_text (GTK_ENTRY(entry1),"");
                 gtk_label_set_text (GTK_LABEL(label3),"start");
                 newlevel_showdialog();
                 g_object_unref(G_OBJECT(builder_dialog));
@@ -447,16 +520,16 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
             }
             if(startchecker == 1)
             {
-                nn = nn -> next;  
+                list_of_words = list_of_words -> next;  
             }
             startchecker = 1;
-            gtk_entry_set_text (entry1,"");
-            strcpy(matched_entry_to_upper,nn -> value);
+            gtk_entry_set_text (GTK_ENTRY(entry1),"");
+            strcpy(matched_entry_to_upper,list_of_words -> value);
             gtk_label_set_text (GTK_LABEL(label3),matched_entry_to_upper);
-            labelvalue = gtk_label_get_text (label3);
+            labelvalue = (gchar *)(gtk_label_get_text (GTK_LABEL(label3)));
         }else
         {
-            strcpy(matched_entry_to_upper,nn -> value);
+            strcpy(matched_entry_to_upper,list_of_words -> value);
         }
     }
     strcpy(matched_entry_to_upper,labelvalue);
@@ -468,231 +541,278 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
 void level1_clicked (GtkWidget *button1,GtkWidget *entry1)
 {
     level = 1;
-    gtk_entry_set_text (entry1,"");
+    if (level > maxlevel) maxlevel = level;
+    gtk_entry_set_text (GTK_ENTRY(entry1),"");
     int openner_feedback;
     struct linkedlist * head;
-    while(nn -> next != NULL && nn != NULL)
+    while(list_of_words -> next != NULL && list_of_words != NULL)
     {
-        head = nn;
-        nn = nn -> next;
+        head = list_of_words;
+        list_of_words = list_of_words -> next;
         free(head);
     }
-    nn = NULL;
-    openner_feedback = levelopener(1,&nn);
-    if (openner_feedback != -1)randomshuffle(&nn,1);
+    list_of_words = NULL;
+    openner_feedback = levelopener(1,&list_of_words);
+    if (openner_feedback != -1)randomshuffle(&list_of_words,1);
 }
 void level1_pressed (GtkWidget *button1,GtkWidget *label3)
 {   
     gtk_label_set_text (GTK_LABEL(label3),"start");
 }
+void level1_released (GtkWidget *button1,GtkWidget *label1)
+{   
+    gtk_label_set_text (GTK_LABEL(label1),"Level 1");
+}
 void level2_clicked (GtkWidget *button2,GtkWidget *entry1)
 {
     level = 2;
-    gtk_entry_set_text (entry1,"");
+    if (level > maxlevel) maxlevel = level;
+    gtk_entry_set_text (GTK_ENTRY(entry1),"");
     int openner_feedback;
     struct linkedlist * head;
-    while(nn -> next != NULL && nn != NULL)
+    while(list_of_words -> next != NULL && list_of_words != NULL)
     {
-        head = nn;
-        nn = nn -> next;
+        head = list_of_words;
+        list_of_words = list_of_words -> next;
         free(head);
     }
-    nn = NULL;
-    openner_feedback = levelopener(2,&nn);
-    if (openner_feedback != -1)randomshuffle(&nn,2);
+    list_of_words = NULL;
+    openner_feedback = levelopener(2,&list_of_words);
+    if (openner_feedback != -1)randomshuffle(&list_of_words,2);
 }
 void level2_pressed (GtkWidget *button2,GtkWidget *label3)
 {   
     gtk_label_set_text (GTK_LABEL(label3),"start");
 }
+void level2_released (GtkWidget *button2,GtkWidget *label1)
+{   
+    gtk_label_set_text (GTK_LABEL(label1),"Level 2");
+}
 void level3_clicked (GtkWidget *button3,GtkWidget *entry1)
 {
     level = 3;
-    gtk_entry_set_text (entry1,"");
+    if (level > maxlevel) maxlevel = level;
+    gtk_entry_set_text (GTK_ENTRY(entry1),"");
     int openner_feedback;
     struct linkedlist * head;
-    while(nn -> next != NULL && nn != NULL)
+    while(list_of_words -> next != NULL && list_of_words != NULL)
     {
-        head = nn;
-        nn = nn -> next;
+        head = list_of_words;
+        list_of_words = list_of_words -> next;
         free(head);
     }
-    nn = NULL;
-    openner_feedback = levelopener(3,&nn);
-    if (openner_feedback != -1)randomshuffle(&nn,3);
+    list_of_words = NULL;
+    openner_feedback = levelopener(3,&list_of_words);
+    if (openner_feedback != -1)randomshuffle(&list_of_words,3);
 }
 void level3_pressed (GtkWidget *button3,GtkWidget *label3)
 {   
     gtk_label_set_text (GTK_LABEL(label3),"start");
 }
+void level3_released (GtkWidget *button3,GtkWidget *label1)
+{   
+    gtk_label_set_text (GTK_LABEL(label1),"Level 3");
+}
 void level4_clicked (GtkWidget *button4,GtkWidget *entry1)
 {
     level = 4;
-    gtk_entry_set_text (entry1,"");
+    if (level > maxlevel) maxlevel = level;
+    gtk_entry_set_text (GTK_ENTRY(entry1),"");
     int openner_feedback;
     struct linkedlist * head;
-    while(nn -> next != NULL && nn != NULL)
+    while(list_of_words -> next != NULL && list_of_words != NULL)
     {
-        head = nn;
-        nn = nn -> next;
+        head = list_of_words;
+        list_of_words = list_of_words -> next;
         free(head);
     }
-    nn = NULL;
-    openner_feedback = levelopener(4,&nn);
-    if (openner_feedback != -1)randomshuffle(&nn,4);
+    list_of_words = NULL;
+    openner_feedback = levelopener(4,&list_of_words);
+    if (openner_feedback != -1)randomshuffle(&list_of_words,4);
 }
 void level4_pressed (GtkWidget *button4,GtkWidget *label3)
 {   
     gtk_label_set_text (GTK_LABEL(label3),"start");
 }
+void level4_released (GtkWidget *button4,GtkWidget *label1)
+{   
+    gtk_label_set_text (GTK_LABEL(label1),"Level 4");
+}
 void level5_clicked (GtkWidget *button5,GtkWidget *entry1)
 {
     level = 5;
-    gtk_entry_set_text (entry1,"");
+    if (level > maxlevel) maxlevel = level;
+    gtk_entry_set_text (GTK_ENTRY(entry1),"");
     int openner_feedback;
     struct linkedlist * head;
-    while(nn -> next != NULL && nn != NULL)
+    while(list_of_words -> next != NULL && list_of_words != NULL)
     {
-        head = nn;
-        nn = nn -> next;
+        head = list_of_words;
+        list_of_words = list_of_words -> next;
         free(head);
     }
-    nn = NULL;
-    openner_feedback = levelopener(5,&nn);
-    if (openner_feedback != -1)randomshuffle(&nn,5);
+    list_of_words = NULL;
+    openner_feedback = levelopener(5,&list_of_words);
+    if (openner_feedback != -1)randomshuffle(&list_of_words,5);
 }
 void level5_pressed (GtkWidget *button5,GtkWidget *label3)
 {   
     gtk_label_set_text (GTK_LABEL(label3),"start");
 }
+void level5_released (GtkWidget *button5,GtkWidget *label1)
+{   
+    gtk_label_set_text (GTK_LABEL(label1),"Level 5");
+}
 void level6_clicked (GtkWidget *button6,GtkWidget *entry1)
 {
     level = 6;
-    gtk_entry_set_text (entry1,"");
+    if (level > maxlevel) maxlevel = level;
+    gtk_entry_set_text (GTK_ENTRY(entry1),"");
     int openner_feedback;
     struct linkedlist * head;
-    while(nn -> next != NULL && nn != NULL)
+    while(list_of_words -> next != NULL && list_of_words != NULL)
     {
-        head = nn;
-        nn = nn -> next;
+        head = list_of_words;
+        list_of_words = list_of_words -> next;
         free(head);
     }
-    nn = NULL;
-    openner_feedback = levelopener(6,&nn);
-    if (openner_feedback != -1)randomshuffle(&nn,6);
+    list_of_words = NULL;
+    openner_feedback = levelopener(6,&list_of_words);
+    if (openner_feedback != -1)randomshuffle(&list_of_words,6);
 }
 void level6_pressed (GtkWidget *button6,GtkWidget *label3)
 {   
     gtk_label_set_text (GTK_LABEL(label3),"start");
 }
+void level6_released (GtkWidget *button6,GtkWidget *label1)
+{   
+    gtk_label_set_text (GTK_LABEL(label1),"Level 6");
+}
 void level7_clicked (GtkWidget *button7,GtkWidget *entry1)
 {
     level = 7;
-    gtk_entry_set_text (entry1,"");
+    if (level > maxlevel) maxlevel = level;
+    gtk_entry_set_text (GTK_ENTRY(entry1),"");
     int openner_feedback;
     struct linkedlist * head;
-    while(nn -> next != NULL && nn != NULL)
+    while(list_of_words -> next != NULL && list_of_words != NULL)
     {
-        head = nn;
-        nn = nn -> next;
+        head = list_of_words;
+        list_of_words = list_of_words -> next;
         free(head);
     }
-    nn = NULL;
-    openner_feedback = levelopener(7,&nn);
-    if (openner_feedback != -1)randomshuffle(&nn,7);
+    list_of_words = NULL;
+    openner_feedback = levelopener(7,&list_of_words);
+    if (openner_feedback != -1)randomshuffle(&list_of_words,7);
 }
 void level7_pressed (GtkWidget *button7,GtkWidget *label3)
 {   
     gtk_label_set_text (GTK_LABEL(label3),"start");
 }
+void level7_released (GtkWidget *button7,GtkWidget *label1)
+{   
+    gtk_label_set_text (GTK_LABEL(label1),"Level 7");
+}
 void level8_clicked (GtkWidget *button8,GtkWidget *entry1)
 {
     level = 8;
-    gtk_entry_set_text (entry1,"");
+    if (level > maxlevel) maxlevel = level;
+    gtk_entry_set_text (GTK_ENTRY(entry1),"");
     int openner_feedback;
     struct linkedlist * head;
-    while(nn -> next != NULL && nn != NULL)
+    while(list_of_words -> next != NULL && list_of_words != NULL)
     {
-        head = nn;
-        nn = nn -> next;
+        head = list_of_words;
+        list_of_words = list_of_words -> next;
         free(head);
     }
-    nn = NULL;
-    openner_feedback = levelopener(8,&nn);
-    if (openner_feedback != -1)randomshuffle(&nn,8);
+    list_of_words = NULL;
+    openner_feedback = levelopener(8,&list_of_words);
+    if (openner_feedback != -1)randomshuffle(&list_of_words,8);
 }
 void level8_pressed (GtkWidget *button8,GtkWidget *label3)
 {   
     gtk_label_set_text (GTK_LABEL(label3),"start");
 }
+void level8_released (GtkWidget *button8,GtkWidget *label1)
+{   
+    gtk_label_set_text (GTK_LABEL(label1),"Level 8");
+}
 void level9_clicked (GtkWidget *button9,GtkWidget *entry1)
 {
     level = 9;
-    gtk_entry_set_text (entry1,"");
+    if (level > maxlevel) maxlevel = level;
+    gtk_entry_set_text (GTK_ENTRY(entry1),"");
     int openner_feedback;
     struct linkedlist * head;
-    while(nn -> next != NULL && nn != NULL)
+    while(list_of_words -> next != NULL && list_of_words != NULL)
     {
-        head = nn;
-        nn = nn -> next;
+        head = list_of_words;
+        list_of_words = list_of_words -> next;
         free(head);
     }
-    nn = NULL;
-    openner_feedback = levelopener(9,&nn);
-    if (openner_feedback != -1)randomshuffle(&nn,9);
+    list_of_words = NULL;
+    openner_feedback = levelopener(9,&list_of_words);
+    if (openner_feedback != -1)randomshuffle(&list_of_words,9);
 }
 void level9_pressed (GtkWidget *button9,GtkWidget *label3)
 {   
     gtk_label_set_text (GTK_LABEL(label3),"start");
 }
+void level9_released (GtkWidget *button9,GtkWidget *label1)
+{   
+    gtk_label_set_text (GTK_LABEL(label1),"Level 9");
+}
 void level10_clicked (GtkWidget *button10,GtkWidget *entry1)
 {
     level = 10;
-    gtk_entry_set_text (entry1,"");
+    if (level > maxlevel) maxlevel = level;
+    gtk_entry_set_text (GTK_ENTRY(entry1),"");
 
     int openner_feedback;
     struct linkedlist * head;
-    while(nn -> next != NULL && nn != NULL)
+    while(list_of_words -> next != NULL && list_of_words != NULL)
     {
-        head = nn;
-        nn = nn -> next;
+        head = list_of_words;
+        list_of_words = list_of_words -> next;
         free(head);
     }
-    nn = NULL;
-    openner_feedback = levelopener(10,&nn);
-    if (openner_feedback != -1)randomshuffle(&nn,10);
+    list_of_words = NULL;
+    openner_feedback = levelopener(10,&list_of_words);
+    if (openner_feedback != -1)randomshuffle(&list_of_words,10);
 }
 void level10_pressed (GtkWidget *button10,GtkWidget *label3)
 {   
     gtk_label_set_text (GTK_LABEL(label3),"start");
 }
+void level10_released (GtkWidget *button10,GtkWidget *label1)
+{   
+    gtk_label_set_text (GTK_LABEL(label1),"Level 10");
+}
 void dialog_closer (void)
 {
-    gtk_widget_destroy (dialog);
+    gtk_widget_destroy (GTK_WIDGET(dialog));
 }
 int main (int argc, char *argv[])
 {
-    srand(time(0));
-    nn = NULL;
-    levelopener(1,&nn);
-    randomshuffle(&nn,1);
-    
-    GError *err = NULL;
-    GtkWidget *window,*menubar,*menuitem1,*menuitem2,*menuitem3,*menuitem4,*label1,*label2,*label3,*progressbar,*entry,*button1,*button2,*button3,*button4,*button5,*button6,*button7,*button8,*button9,*button10;
+    srand(time(NULL));
+    list_of_words = NULL;
+    levelopener(1,&list_of_words);
+    randomshuffle(&list_of_words,1);
+    isinscoreboard("behnam", -300000);
+    GtkWidget *window,*menubar,*menuitem1,*menuitem2,*menuitem3,*menuitem4,*label1,*label3,*progressbar,*entry,*button1,*button2,*button3,*button4,*button5,*button6,*button7,*button8,*button9,*button10;
     gtk_init (&argc, &argv);
     builder = gtk_builder_new ();
     builder_dialog = gtk_builder_new ();
-    printf("%s\n", err);
+    // GError *err = NULL;  baraye printe errore builder NULL e payin ba &err jabeja she
 
-    gtk_builder_add_from_file (builder, "GUI.glade", &err);
-    if (err){
-        g_print(err->message);
-        printf("%s\n", err);
-        return 1;
-    }
+    gtk_builder_add_from_file (builder, "GUI.glade", NULL);
+    // if (err){
+    //     g_print(err->message);
+    //     printf("%s\n", err);      Baraye moshahede daghighe error uncomment she
+    //     return 1;
+    // }
     window = GTK_WIDGET(gtk_builder_get_object(builder,"window_main"));
-    // dialog = GTK_WIDGET(gtk_builder_get_object(builder,"dialog_newlevel"));
-    // gtk_builder_connect_signals(builder,"dialog_newlevel");
     button1 = GTK_WIDGET(gtk_builder_get_object(builder,"button1"));
     button2 = GTK_WIDGET(gtk_builder_get_object(builder,"button2"));
     button3 = GTK_WIDGET(gtk_builder_get_object(builder,"button3"));
@@ -704,7 +824,6 @@ int main (int argc, char *argv[])
     button9 = GTK_WIDGET(gtk_builder_get_object(builder,"button9"));
     button10 = GTK_WIDGET(gtk_builder_get_object(builder,"button10"));
     progressbar = GTK_WIDGET(gtk_builder_get_object(builder,"progressbar1"));
-    // g_signal_connect (button, "clicked", G_CALLBACK (print_text), NULL);
     entry = GTK_WIDGET(gtk_builder_get_object(builder,"entry1"));
     label1 = GTK_WIDGET(gtk_builder_get_object(builder,"label1"));
     label2 = GTK_WIDGET(gtk_builder_get_object(builder,"label2"));
@@ -736,27 +855,10 @@ int main (int argc, char *argv[])
     gtk_builder_connect_signals(builder,"menuitem3");
     gtk_builder_connect_signals(builder,"menuitem4");
 
-
-    // button11 = GTK_WIDGET(gtk_builder_get_object(builder,"button11"));
-    // gtk_builder_connect_signals(builder,"button11");
-    // button12 = GTK_WIDGET(gtk_builder_get_object(builder,"button12"));
-    // gtk_builder_connect_signals(builder,"button12");
-    // label4 = GTK_WIDGET(gtk_builder_get_object(builder,"label4"));
-    // gtk_builder_connect_signals(builder,"label4");
-    // label5 = GTK_WIDGET(gtk_builder_get_object(builder,"label5"));
-    // gtk_builder_connect_signals(builder,"label5");
-    // statusbar1 = GTK_WIDGET(gtk_builder_get_object(builder,"statusbar1"));
-    // gtk_builder_connect_signals(builder,"statusbar1");
-
-
-    // user_function (GtkDialog *arg0,gpointer   user_data)
-
-    // newlevel_showdialog(button11,button12,label4,label5,statusbar1,dialog_newlevel,builder);
-
-
     
     g_object_unref(G_OBJECT(builder));
     gtk_widget_show(GTK_WIDGET(window));
+    game_start();
     gtk_main ();
     return 0;
 }

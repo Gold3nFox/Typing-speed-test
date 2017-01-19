@@ -72,6 +72,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <signal name="clicked" handler="save_clicked" object="label3" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -125,6 +126,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <signal name="clicked" handler="name_clicked" object="entry2" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -534,6 +536,7 @@
                     <property name="receives_default">True</property>
                     <signal name="clicked" handler="level1_clicked" object="entry1" swapped="no"/>
                     <signal name="pressed" handler="level1_pressed" object="label3" swapped="no"/>
+                    <signal name="released" handler="level1_released" object="label1" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -549,6 +552,7 @@
                     <property name="receives_default">True</property>
                     <signal name="clicked" handler="level2_clicked" object="entry1" swapped="no"/>
                     <signal name="pressed" handler="level2_pressed" object="label3" swapped="no"/>
+                    <signal name="released" handler="level2_released" object="label1" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -564,6 +568,7 @@
                     <property name="receives_default">True</property>
                     <signal name="clicked" handler="level3_clicked" object="entry1" swapped="no"/>
                     <signal name="pressed" handler="level3_pressed" object="label3" swapped="no"/>
+                    <signal name="released" handler="level3_released" object="label1" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -579,6 +584,7 @@
                     <property name="receives_default">True</property>
                     <signal name="clicked" handler="level4_clicked" object="entry1" swapped="no"/>
                     <signal name="pressed" handler="level4_pressed" object="label3" swapped="no"/>
+                    <signal name="released" handler="level4_released" object="label1" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -594,6 +600,7 @@
                     <property name="receives_default">True</property>
                     <signal name="clicked" handler="level5_clicked" object="entry1" swapped="no"/>
                     <signal name="pressed" handler="level5_pressed" object="label3" swapped="no"/>
+                    <signal name="released" handler="level5_released" object="label1" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -609,6 +616,7 @@
                     <property name="receives_default">True</property>
                     <signal name="clicked" handler="level6_clicked" object="entry1" swapped="no"/>
                     <signal name="pressed" handler="level6_pressed" object="label3" swapped="no"/>
+                    <signal name="released" handler="level6_released" object="label1" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -624,6 +632,7 @@
                     <property name="receives_default">True</property>
                     <signal name="clicked" handler="level7_clicked" object="entry1" swapped="no"/>
                     <signal name="pressed" handler="level7_pressed" object="label3" swapped="no"/>
+                    <signal name="released" handler="level7_released" object="label1" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -639,6 +648,7 @@
                     <property name="receives_default">True</property>
                     <signal name="clicked" handler="level8_clicked" object="entry1" swapped="no"/>
                     <signal name="pressed" handler="level8_pressed" object="label3" swapped="no"/>
+                    <signal name="released" handler="level8_released" object="label1" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -654,6 +664,7 @@
                     <property name="receives_default">True</property>
                     <signal name="clicked" handler="level9_clicked" object="entry1" swapped="no"/>
                     <signal name="pressed" handler="level9_pressed" object="label3" swapped="no"/>
+                    <signal name="released" handler="level9_released" object="label1" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -669,6 +680,7 @@
                     <property name="receives_default">True</property>
                     <signal name="clicked" handler="level10_clicked" object="entry1" swapped="no"/>
                     <signal name="pressed" handler="level10_pressed" object="label3" swapped="no"/>
+                    <signal name="released" handler="level10_released" object="label1" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
