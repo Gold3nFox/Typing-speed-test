@@ -13,15 +13,17 @@ char * scoreboard_toshow[10];
 bool started=0;
 bool startchecker =0;
 int wordnum = 0;
+int level_is_passed_or_not[10];
 int all_chars = 0;
 int word_wrong_chars = 0;
 int level = 1;
 int maxlevel= 1;
+int max_saved_level = 0;
 float score = 0,levelscore = 0,player_score = 0;
 GtkHButtonBox * buttonbox;
 GtkDialog *dialog,*dialog_playername;
 GtkBuilder *builder, *builder_dialog,*builder_dialog_scoreboard,*start_builder;
-GtkWidget *entry2,*button11,*button12,*button13,*label2,*label4,*label5,*label6,*label7,*label8,*label9,*label10,*label11,*label12,*label13,*label14,*label15,*label16,*messagedialog_scoreboard,*statusbar1,*dialog_newlevel;
+GtkWidget *entry2,*button11,*button12,*button13,*label1,*label2,*label4,*label5,*label6,*label7,*label8,*label9,*label10,*label11,*label12,*label13,*label14,*label15,*label16,*messagedialog_scoreboard,*statusbar1,*dialog_newlevel,*button1,*button2,*button3,*button4,*button5,*button6,*button7,*button8,*button9,*button10;
 clock_t start_t, end_t, total_t;
 // chon nemitonam ro xml bishtar az ye object bedam be eventa baranke dasresi dashte basham global bayad bokonam
 // albate bishtar az ye objectam shayad beshe man chizi peyda nakardam
@@ -76,54 +78,56 @@ int savedornot(char *esm)
 {
     int i = 0;
     FILE *fp;
-    int player_level;
+    int player_level = 0;
+    int player_highest_lvl = 1;
     char * names_in_file;
     names_in_file = (char *)malloc(20 * sizeof(char));
     if (!(fp = fopen("save.txt", "rt"))) {
-        while(!(fp = fopen("save.txt", "rt")))
-        {
-            printf("Trying to open this level for you\n");
-            i++;
-            if(i == 5)
-            {
-                printf("Couldn't open that level please choose another level\n");
-                fclose(fp);
-                return -1;            
-            } 
-        }
+        printf("Couldn't open that level please choose another level\n");
+        fclose(fp);
+        return -1;            
     }
     while (!feof(fp))
     {
         fscanf(fp, "%s %d", names_in_file, &player_level);
         if(strcmp(esm, names_in_file) == 0)
         {
-            return player_level;
+        	printf("%s  %d\n", names_in_file, player_level);
+            if(player_level > player_highest_lvl) player_highest_lvl = player_level;
         }
     }
     fclose(fp);
-    return 0;
+    return player_highest_lvl;
 }
 
 
 int save(char *esm,int level)
 {
+	int player_levels;
     FILE *fp;
+    char * names_in_file;
+    names_in_file = (char *)malloc(20 * sizeof(char));
+    if (!(fp = fopen("save.txt", "rt"))) {
+        printf("Failed to open FILE\n");
+        return -1;
+    }
+    while (!feof(fp))
+    {
+        fscanf(fp, "%s %d", names_in_file, &player_levels);
+        if(strcmp(esm, names_in_file) == 0)
+        {
+            if(player_levels >= maxlevel)  return savedornot(esm);
+        }
+    }
+    fclose(fp);
     if (!(fp = fopen("save.txt", "a+"))) {
         printf("Failed to open FILE\n");
         return -1;
     }
-    if( savedornot(esm) == 0 )
-    {
-        fprintf(fp, "%s %d",esm,level);
-        fprintf(fp,"\n");
-        fclose(fp);
-        return 0;
-    }
-    else
-    {
-        fclose(fp);
-        return savedornot(esm);
-    }
+    fprintf(fp, "%s %d",esm,level);
+    fprintf(fp,"\n");
+    fclose(fp);
+    return savedornot(esm);
 }
 
 int levelopener(int a,struct linkedlist ** list_of_words)
@@ -298,6 +302,14 @@ int isinscoreboard(char * esm,float newscore)
     return 0;
 }
 
+void game_quit(GtkWidget * button12)
+{
+	exit(1);
+}
+void game_about(GtkWidget * button12)
+{
+	printf("Heres game address on github%s\n","https://github.com/Gold3nFox/Typing-speed-test.git" );
+}
 void newlevel_showdialog (void)
 {
     gtk_widget_show (GTK_WIDGET(dialog));
@@ -354,8 +366,16 @@ void tolowerchanged (char * str2)
 void save_clicked(GtkWidget * button12,GtkWidget * label3)
 {
     isinscoreboard(player_name,player_score);
+    printf("%d------------>>>\n", maxlevel);
+    if(maxlevel != 10) save(player_name,maxlevel+1);
+    if(maxlevel == 10) save(player_name,maxlevel);
+    gtk_widget_hide(button12);
+}
+void save_clicked_file(GtkWidget * button12,GtkWidget * label3)
+{
+    isinscoreboard(player_name,player_score);
+    printf("%d------------>>>\n", maxlevel);
     save(player_name,maxlevel);
-    // printf("%s--%f\n",top10[0].name,top10[0].score );
 }
 void show_dialog_scoreboard(void)
 {
@@ -408,8 +428,61 @@ void start_clicked(GtkWidget * button11,GtkWidget * label3)
         levelopener(level+1,&list_of_words);
         randomshuffle(&list_of_words,level+1);
         gtk_widget_destroy(GTK_WIDGET(dialog));
+        char * current_level;
+        char * level_number;
+        if(level ==1  )
+        {
+        	level_is_passed_or_not[0] = 0;
+        	gtk_widget_show_all (button2);	
+        } 
+        if(level ==2  )
+        {
+        	level_is_passed_or_not[1] = 0;
+        	gtk_widget_show_all (button3);	
+        } 
+        if(level ==3  )
+        {
+        	level_is_passed_or_not[2] = 0;
+        	gtk_widget_show_all (button5);	
+        } 
+        if(level ==4 )
+        {
+        	level_is_passed_or_not[3] = 0;
+        	gtk_widget_show_all (button4);	
+        } 
+        if(level ==5  )
+        {
+        	level_is_passed_or_not[4] = 0;
+        	gtk_widget_show_all (button6);	
+        } 
+        if(level ==6 )
+        {
+        	level_is_passed_or_not[5] = 0;
+        	gtk_widget_show_all (button9);	
+        } 
+        if(level ==7  )
+        {
+        	level_is_passed_or_not[6] = 0;
+        	gtk_widget_show_all (button7);	
+        } 
+        if(level ==8 )
+        {
+        	level_is_passed_or_not[7] = 0;
+        	gtk_widget_show_all (button8);	
+        } 
+        if(level ==9 )
+        {
+        	level_is_passed_or_not[8] = 0;
+        	gtk_widget_show_all (button10);	
+        } 
         level++;
-        if (level > maxlevel) maxlevel = level;
+        current_level = (char *)malloc(8*sizeof(char));
+        level_number = (char *)malloc(2*sizeof(char));
+        strcpy(current_level,"Level ");
+        sprintf(level_number,"%d",level);
+        strcat(current_level,level_number);
+        gtk_label_set_text (GTK_LABEL(label1),current_level);
+    	if (level > maxlevel) maxlevel = level;
     }else
     {
         show_dialog_scoreboard();
@@ -430,19 +503,84 @@ void game_start(void)
     gtk_builder_connect_signals(start_builder,"entry2");
     gtk_entry_set_max_length (entry2,14);
 
+
     gtk_widget_show (GTK_WIDGET(dialog_playername));
 
 
 }
+void locked_level_disabler(void)
+{
+	char * button_name;
+	char * button_number;
+	button_number = (char *)malloc(2*sizeof(char));
+	button_name = (char *)malloc(7*sizeof(char));
+	if(max_saved_level <= 9)
+	{
+		level_is_passed_or_not[8] = 1;
+		gtk_widget_hide(button10);
+	}
+	if(max_saved_level <= 8)
+	{
+		level_is_passed_or_not[7] = 1;
+		gtk_widget_hide(button8);	
+	} 
+	if(max_saved_level <= 7)
+	{
+		level_is_passed_or_not[6] = 1;
+		gtk_widget_hide(button7);	
+	} 
+	if(max_saved_level <= 6)
+	{
+		level_is_passed_or_not[5] = 1;
+		gtk_widget_hide(button9);	
+	} 
+	if(max_saved_level <= 5) 
+	{
+		level_is_passed_or_not[4] = 1;
+		gtk_widget_hide(button6);
+	}
+	if(max_saved_level <= 4)
+	{
+		level_is_passed_or_not[3] = 1;
+		gtk_widget_hide(button4);	
+	} 
+	if(max_saved_level <= 3)
+	{
+		level_is_passed_or_not[2] = 1;
+		gtk_widget_hide(button5);
+	} 
+	if(max_saved_level <= 2)
+	{
+		level_is_passed_or_not[1] = 1;
+		gtk_widget_hide(button3);	
+	} 
+	if(max_saved_level <= 1)
+	{
+		level_is_passed_or_not[0] = 1;
+		gtk_widget_hide(button2);	
+	} 
+}
 void name_clicked (GtkWidget * button13 , GtkWidget * entry2)
 {
 	player_name = malloc(15*sizeof(char));
-	printf("alo\n");
 	player_name = (gchar *)(gtk_entry_get_text(GTK_ENTRY(entry2)));
-	printf("%s-------\n",player_name);
-	printf("%s kkkkkdkkdkd\n",player_name );
+	max_saved_level = savedornot(player_name);
+	level = max_saved_level;
+	maxlevel = max_saved_level;
+	printf("%d---------\n",max_saved_level );
+	locked_level_disabler();
     gtk_label_set_text(label2,player_name);
 	gtk_widget_hide (dialog_playername);
+	levelopener(max_saved_level,&list_of_words);
+    randomshuffle(&list_of_words,max_saved_level);
+    char * loaded_level_name;
+    char * loaded_level_number;
+    loaded_level_number = (char *)malloc(2*sizeof(char));
+    loaded_level_name = (char *)malloc(9*sizeof(char));
+    strcpy(loaded_level_name,"Level ");
+    sprintf(loaded_level_number,"%d",max_saved_level);
+    strcat(loaded_level_name,loaded_level_number);
+    gtk_label_set_text (GTK_LABEL(label1),loaded_level_name);
 
 }
 
@@ -514,6 +652,7 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
 
                 gtk_entry_set_text (GTK_ENTRY(entry1),"");
                 gtk_label_set_text (GTK_LABEL(label3),"start");
+                gtk_label_set_text (GTK_LABEL(label4),player_name);
                 newlevel_showdialog();
                 g_object_unref(G_OBJECT(builder_dialog));
                 return;
@@ -797,10 +936,8 @@ int main (int argc, char *argv[])
 {
     srand(time(NULL));
     list_of_words = NULL;
-    levelopener(1,&list_of_words);
-    randomshuffle(&list_of_words,1);
     isinscoreboard("behnam", -300000);
-    GtkWidget *window,*menubar,*menuitem1,*menuitem2,*menuitem3,*menuitem4,*label1,*label3,*progressbar,*entry,*button1,*button2,*button3,*button4,*button5,*button6,*button7,*button8,*button9,*button10;
+    GtkWidget *window,*menubar,*menuitem1,*menuitem2,*menuitem3,*menuitem4,*label3,*progressbar,*entry;
     gtk_init (&argc, &argv);
     builder = gtk_builder_new ();
     builder_dialog = gtk_builder_new ();

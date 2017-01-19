@@ -1,3 +1,11 @@
 chetori 5
 khoobam 6
 salam 3
+goldenfox 1
+newplayer 5
+admin 10
+goldenfox 4
+goldenfox 5
+admin 10
+goldenfox 7
+goldenfox 8
