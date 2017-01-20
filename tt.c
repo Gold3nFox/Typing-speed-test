@@ -325,12 +325,15 @@ int isinscoreboard(char * esm,float newscore)
         fprintf(fp, "%s %.1f \n",top10[i].name,*(top10[i].score));
     }
     fclose(fp);
+    char * score_of_top10s;
+    score_of_top10s = (char *)malloc(10*sizeof(char));
     for (int i = 0; i < 10; ++i)
     {
-        scoreboard_toshow[i] = malloc(30*sizeof(char));
-        sprintf(scoreboard_toshow[i],"%.1f",*(top10[i].score));
-        strcat(scoreboard_toshow[i],":");
-        strcat(scoreboard_toshow[i],top10[i].name);
+        scoreboard_toshow[i] = malloc(32*sizeof(char));
+        strcpy(scoreboard_toshow[i],top10[i].name);
+        sprintf(score_of_top10s,"%.1f",*(top10[i].score));
+        strcat(scoreboard_toshow[i]," : ");
+        strcat(scoreboard_toshow[i],score_of_top10s);
     }
     return 0;
 }
