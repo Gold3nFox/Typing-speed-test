@@ -193,7 +193,7 @@
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="message_type">other</property>
-    <property name="buttons">GTK_BUTTONS_CANCEL</property>
+    <property name="buttons">GTK_BUTTONS_CLOSE</property>
     <signal name="button-release-event" handler="scoreboard_close" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkVBox" id="dialog-vbox">

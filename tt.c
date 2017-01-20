@@ -18,13 +18,14 @@ int level = 1;
 int maxlevel= 1;
 int gameispaused = 0;
 int max_saved_level = 0;
+int current_word_number_on_list = 0;
 int wrong_characters,all_characters;
 float score = 0,levelscore = 0,player_score = 0;
 int score_mode = 0;
 GtkHButtonBox * buttonbox;
 GtkDialog *dialog,*dialog_playername;
 GtkBuilder *builder, *builder_dialog,*builder_dialog_scoreboard,*start_builder;
-GtkWidget *buttonpause,*entry2,*entry,*button11,*button12,*button13,*label1,*label2,*label4,*label5,*label6,*label7,*label8,*label9,*label10,*label11,*label12,*label13,*label14,*label15,*label16,*messagedialog_scoreboard,*statusbar1,*dialog_newlevel,*button1,*button2,*button3,*button4,*button5,*button6,*button7,*button8,*button9,*button10;
+GtkWidget *progressbar,*buttonpause,*entry2,*entry,*button11,*button12,*button13,*label1,*label2,*label4,*label5,*label6,*label7,*label8,*label9,*label10,*label11,*label12,*label13,*label14,*label15,*label16,*messagedialog_scoreboard,*statusbar1,*dialog_newlevel,*button1,*button2,*button3,*button4,*button5,*button6,*button7,*button8,*button9,*button10;
 clock_t start_t, end_t, total_t , pause_t =0,resume_t =0;
 // chon nemitonam ro xml bishtar az ye object bedam be eventa baranke dasresi dashte basham global bayad bokonam
 // albate bishtar az ye objectam shayad beshe man chizi peyda nakardam
@@ -576,6 +577,7 @@ void show_dialog_scoreboard(void)
 }
 void start_clicked(GtkWidget * button11,GtkWidget * label3)
 {
+	gtk_progress_bar_set_fraction (progressbar,0);
     if (level < 10)
     {
         levelopener(level+1,&list_of_words);
@@ -639,6 +641,8 @@ void start_clicked(GtkWidget * button11,GtkWidget * label3)
     	if (level > maxlevel) maxlevel = level;
     }else
     {
+    	levelopener(level,&list_of_words);
+        randomshuffle(&list_of_words,level);
         show_dialog_scoreboard();
     }
 }
@@ -721,6 +725,7 @@ void locked_level_disabler(void)
 }
 void name_clicked (GtkWidget * button13 , GtkWidget * entry2)
 {
+	gtk_progress_bar_set_fraction (progressbar,0);
 	player_name = malloc(15*sizeof(char));
 	player_name = (gchar *)(gtk_entry_get_text(GTK_ENTRY(entry2)));
 	max_saved_level = savedornot(player_name);
@@ -744,6 +749,7 @@ void name_clicked (GtkWidget * button13 , GtkWidget * entry2)
 
 void text_changed(GtkWidget *entry1, GtkWidget *label3){
     char *score_to_string;
+    float progress_amount = 0;
     gchar * input;
     gchar * labelvalue;
     input = (gchar *)(gtk_entry_get_text (GTK_ENTRY(entry1)));
@@ -753,6 +759,7 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
     char * matched_entry_to_upper = malloc(strlen(labelvalue)*sizeof(char));
     if(strcmp(input,"start ") == 0)
     {
+    	current_word_number_on_list = 0;
     	resume_t = 0;
 		pause_t = 0;
     	wrong_characters = 0;
@@ -761,7 +768,9 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
         started = 1;
     }else if(input[strlen(input)-1] == ' ')
     {
-
+    	current_word_number_on_list++;
+    	progress_amount = (double)current_word_number_on_list / (double)wordnum;
+    	gtk_progress_bar_set_fraction (progressbar,progress_amount);
     	all_characters += strlen(list_of_words -> value);
     	wrong_characters += wrong_chars(list_of_words -> value,input);
     }
@@ -839,6 +848,7 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
 }
 void level1_clicked (GtkWidget *button1,GtkWidget *entry1)
 {
+	gtk_progress_bar_set_fraction (progressbar,0);
     level = 1;
     if (level > maxlevel) maxlevel = level;
     gtk_entry_set_text (GTK_ENTRY(entry1),"");
@@ -864,6 +874,7 @@ void level1_released (GtkWidget *button1,GtkWidget *label1)
 }
 void level2_clicked (GtkWidget *button2,GtkWidget *entry1)
 {
+	gtk_progress_bar_set_fraction (progressbar,0);
     level = 2;
     if (level > maxlevel) maxlevel = level;
     gtk_entry_set_text (GTK_ENTRY(entry1),"");
@@ -889,6 +900,7 @@ void level2_released (GtkWidget *button2,GtkWidget *label1)
 }
 void level3_clicked (GtkWidget *button3,GtkWidget *entry1)
 {
+	gtk_progress_bar_set_fraction (progressbar,0);
     level = 3;
     if (level > maxlevel) maxlevel = level;
     gtk_entry_set_text (GTK_ENTRY(entry1),"");
@@ -914,6 +926,7 @@ void level3_released (GtkWidget *button3,GtkWidget *label1)
 }
 void level4_clicked (GtkWidget *button4,GtkWidget *entry1)
 {
+	gtk_progress_bar_set_fraction (progressbar,0);
     level = 4;
     if (level > maxlevel) maxlevel = level;
     gtk_entry_set_text (GTK_ENTRY(entry1),"");
@@ -939,6 +952,7 @@ void level4_released (GtkWidget *button4,GtkWidget *label1)
 }
 void level5_clicked (GtkWidget *button5,GtkWidget *entry1)
 {
+	gtk_progress_bar_set_fraction (progressbar,0);
     level = 5;
     if (level > maxlevel) maxlevel = level;
     gtk_entry_set_text (GTK_ENTRY(entry1),"");
@@ -964,6 +978,7 @@ void level5_released (GtkWidget *button5,GtkWidget *label1)
 }
 void level6_clicked (GtkWidget *button6,GtkWidget *entry1)
 {
+	gtk_progress_bar_set_fraction (progressbar,0);
     level = 6;
     if (level > maxlevel) maxlevel = level;
     gtk_entry_set_text (GTK_ENTRY(entry1),"");
@@ -989,6 +1004,7 @@ void level6_released (GtkWidget *button6,GtkWidget *label1)
 }
 void level7_clicked (GtkWidget *button7,GtkWidget *entry1)
 {
+	gtk_progress_bar_set_fraction (progressbar,0);
     level = 7;
     if (level > maxlevel) maxlevel = level;
     gtk_entry_set_text (GTK_ENTRY(entry1),"");
@@ -1014,6 +1030,7 @@ void level7_released (GtkWidget *button7,GtkWidget *label1)
 }
 void level8_clicked (GtkWidget *button8,GtkWidget *entry1)
 {
+	gtk_progress_bar_set_fraction (progressbar,0);
     level = 8;
     if (level > maxlevel) maxlevel = level;
     gtk_entry_set_text (GTK_ENTRY(entry1),"");
@@ -1039,6 +1056,7 @@ void level8_released (GtkWidget *button8,GtkWidget *label1)
 }
 void level9_clicked (GtkWidget *button9,GtkWidget *entry1)
 {
+	gtk_progress_bar_set_fraction (progressbar,0);
     level = 9;
     if (level > maxlevel) maxlevel = level;
     gtk_entry_set_text (GTK_ENTRY(entry1),"");
@@ -1064,6 +1082,7 @@ void level9_released (GtkWidget *button9,GtkWidget *label1)
 }
 void level10_clicked (GtkWidget *button10,GtkWidget *entry1)
 {
+	gtk_progress_bar_set_fraction (progressbar,0);
     level = 10;
     if (level > maxlevel) maxlevel = level;
     gtk_entry_set_text (GTK_ENTRY(entry1),"");
@@ -1097,7 +1116,7 @@ int main (int argc, char *argv[])
     srand(time(NULL));
     list_of_words = NULL;
     isinscoreboard("behnam", -300000);
-    GtkWidget *window,*menubar,*menuitem1,*menuitem2,*menuitem3,*menuitem4,*label3,*progressbar;
+    GtkWidget *window,*menubar,*menuitem1,*menuitem2,*menuitem3,*menuitem4,*label3;
     gtk_init (&argc, &argv);
     builder = gtk_builder_new ();
     builder_dialog = gtk_builder_new ();
