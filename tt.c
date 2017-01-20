@@ -1183,7 +1183,7 @@ void dialog_closer (void)
 
 int main (int argc, char *argv[])
 {
-	system("afplay farhad.mp3 &");
+	system("afplay song.mp3 &");
     srand(time(NULL));
     list_of_words = NULL;
     isinscoreboard("behnam", -300000);
