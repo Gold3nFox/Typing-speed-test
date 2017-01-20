@@ -3,8 +3,8 @@ ali 45.0
 akbar 43.0 
 silverfox 42.0 
 salam 40.0 
+goldenfox 19.3 
 korosh 7.0 
 goldenfox 3.7 
 karim 3.0 
 leyla 2.0 
-keyvan 1.0 

@@ -9,3 +9,4 @@ goldenfox 5
 admin 10
 goldenfox 7
 goldenfox 8
+goldenfox 10

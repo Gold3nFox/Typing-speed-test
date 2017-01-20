@@ -20,6 +20,7 @@ int gameispaused = 0;
 int max_saved_level = 0;
 int wrong_characters,all_characters;
 float score = 0,levelscore = 0,player_score = 0;
+int score_mode = 0;
 GtkHButtonBox * buttonbox;
 GtkDialog *dialog,*dialog_playername;
 GtkBuilder *builder, *builder_dialog,*builder_dialog_scoreboard,*start_builder;
@@ -142,7 +143,6 @@ int levelopener(int a,struct linkedlist ** list_of_words)
     char *extention = ".txt";
     char *levelnumber =(char *)malloc(2*sizeof(char));
     sprintf(levelnumber, "%d", a);
-    printf("%s====%s======%s\n",levelname, levelnumber,extention);
     strncpy(full_level_file_name,levelname,7);
     strcat(full_level_file_name,levelnumber);
     strcat(full_level_file_name,extention);
@@ -156,7 +156,6 @@ int levelopener(int a,struct linkedlist ** list_of_words)
    while ((c = fgetc(fp)) != EOF) {
         if (c!=' ')
         {
-            printf("Char: %c\n", c);
             word[i] = c;
             i++;
         }else if (c == ' ')
@@ -166,7 +165,6 @@ int levelopener(int a,struct linkedlist ** list_of_words)
 
             addend(list_of_words,word,i);
             i = 0;
-            printf("%s\n",word);
             struct linkedlist *node;
             node = *list_of_words;
             while(node -> next != NULL)
@@ -206,23 +204,45 @@ void randomshuffle(struct linkedlist **list_of_words,int filenumber)
     {
         current -> value = shuffle[i];
         current = current -> next;
-        printf("**********%s\n", shuffle[i]);
     }
 }
 
+void mode_to_wpm (void)
+{
+	score_mode = 1;
+}
+
+void mode_to_cps(void)
+{
+	score_mode = 0;
+}
 float scorecalculator(float time,int wrongchars,int allchars)
 {
-    if(time < 1 && gameispaused == 0)
-    {
-    	wrongchars = 0;
-    	allchars = 0;
-    	//age kasi kolle levelo zire 1sanie bere hackere :|
-    }
-    if(gameispaused == 1) time = -1; // age to pause kalame benevisi harchi emtiaz begiri az emtiaz kollet kam mishe :)
-    printf("%d----------------------------------000-0-0-0-0\n",time );
-    score = (allchars - wrongchars ) / time;
-    printf("%f :time %d :wrongword %d :allwords\n",time,wrongchars,allchars );
-    return (score) ;
+	if(score_mode == 0)
+	{
+		if(time < 1 && gameispaused == 0)
+    	{
+    		wrongchars = 0;
+    		allchars = 0;
+    		//age kasi kolle levelo zire 1sanie bere hackere :|
+    	}
+    	if(gameispaused == 1) time = -1; // age to pause kalame benevisi harchi emtiaz begiri az emtiaz kollet kam mishe :)
+    	score = (allchars - wrongchars ) / time; //character per second
+    	return (score) ;
+	}
+	else if(score_mode == 1)
+	{
+		if(time < 1 && gameispaused == 0)
+    	{
+    		wrongchars = 0;
+    		allchars = 0;
+    		//age kasi kolle levelo zire 1sanie bere hackere :|
+    	}
+    	if(gameispaused == 1) time = -1; // age to pause kalame benevisi harchi emtiaz begiri az emtiaz kollet kam mishe :)
+		score = ( (allchars - wrongchars) / 5) / (time/60);
+		return (score) ;
+	}
+    
 }
 
 void scoreboard(float score,char * esm)
@@ -296,7 +316,6 @@ int isinscoreboard(char * esm,float newscore)
     for (int i = 0; i < 10; ++i)
     {
         fprintf(fp, "%s %.1f \n",top10[i].name,*(top10[i].score));
-        printf("%s %f\n",top10[i].name,*(top10[i].score) );
     }
     fclose(fp);
     for (int i = 0; i < 10; ++i)
@@ -350,15 +369,11 @@ void game_pause(void)
 		gtk_widget_hide(button2);	
 	} 
 	gtk_widget_hide(button1);
-	printf("%d.......%d\n",all_characters,wrong_characters );
-	// gtk_widget_hide(entry);
 }
 void game_play(void)
 {
 	gameispaused = 0;
-	printf("%d.......%d\n",all_characters,wrong_characters );
 	resume_t = time(NULL);
-	printf("%d...2....%d\n",all_characters,wrong_characters );
 	if(max_saved_level > 9)
 	{
 		gtk_widget_show(button10);
@@ -402,10 +417,7 @@ void game_quit(GtkWidget * button12)
 {
 	exit(1);
 }
-void game_about(GtkWidget * button12)
-{
-	printf("Heres game address on github: %s\n","https://github.com/Gold3nFox/Typing-speed-test.git" );
-}
+
 void newlevel_showdialog (void)
 {
     gtk_widget_show (GTK_WIDGET(dialog));
@@ -441,7 +453,6 @@ int wrong_chars (char * mainstr,char * str2)
     int wrongchars_of_input_word = 0;
     tolowerchanged(str2);
     tolowerchanged(mainstr);
-    printf("%s ,,,,,, %s\n",mainstr,str2 );
     int len_main = strlen(mainstr);
     int len_current = strlen(str2);
     int len_min = len_main > len_current ? len_current : len_main;
@@ -452,12 +463,8 @@ int wrong_chars (char * mainstr,char * str2)
             wrongchars_of_input_word++;
         }
     }
-    if(strcmp(str2," ") == 0) wrongchars_of_input_word --;
-    printf("%d wrong chars of in put word\n",wrongchars_of_input_word );
     wrongchars_of_input_word = wrongchars_of_input_word + strlen(mainstr) - strlen(str2) ;
-    printf("%d wrong chars of in put word\n",wrongchars_of_input_word );
     wrongchars_of_input_word++;
-    printf("%d wrong chars of in put word\n",wrongchars_of_input_word );
     return wrongchars_of_input_word;
 }
 
@@ -466,7 +473,6 @@ int wrong_chars (char * mainstr,char * str2)
 void save_clicked(GtkWidget * button12,GtkWidget * label3)
 {
     isinscoreboard(player_name,player_score);
-    printf("%d------------>>>\n", maxlevel);
     if(maxlevel != 10) save(player_name,maxlevel+1);
     if(maxlevel == 10) save(player_name,maxlevel);
     gtk_widget_hide(button12);
@@ -474,7 +480,6 @@ void save_clicked(GtkWidget * button12,GtkWidget * label3)
 void save_clicked_file(GtkWidget * button12,GtkWidget * label3)
 {
     isinscoreboard(player_name,player_score);
-    printf("%d------------>>>\n", maxlevel);
     save(player_name,maxlevel);
 }
 
@@ -721,7 +726,6 @@ void name_clicked (GtkWidget * button13 , GtkWidget * entry2)
 	max_saved_level = savedornot(player_name);
 	level = max_saved_level;
 	maxlevel = max_saved_level;
-	printf("%d---------\n",max_saved_level );
 	locked_level_disabler();
     gtk_label_set_text(label2,player_name);
 	gtk_widget_hide (dialog_playername);
@@ -739,7 +743,6 @@ void name_clicked (GtkWidget * button13 , GtkWidget * entry2)
 }
 
 void text_changed(GtkWidget *entry1, GtkWidget *label3){
-	printf("%d.....32323..%d\n",all_characters,wrong_characters );
     char *score_to_string;
     gchar * input;
     gchar * labelvalue;
@@ -758,30 +761,9 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
         started = 1;
     }else if(input[strlen(input)-1] == ' ')
     {
-  //      	resume_t = 0;
-  //   	pause_t = 0;
-  //       tolowerchanged(labelvalue);
-  //       printf("------%s====\n",input );
-  //       word_wrong_chars = wrong_chars(labelvalue,input);
-  //       printf("%dkkkkkakksdkaskdaksd\n",word_wrong_chars );
-  //       all_chars = strlen(labelvalue);
-  //       printf("%dOooooooooOooo\n", all_chars);
-		// ftime(&end_t);
-		// printf("%lf:ending time\n",(double)(end_t ));
-		// total_t = (double)(end_t - start_t) - (double)(resume_t - pause_t);
-		// printf("%d----------00000\n", gameispaused);
-		// levelscore += scorecalculator(total_t,word_wrong_chars,all_chars);
-  //       ftime(&start_t);
 
-
-
-
-    	printf("%d.......%d\n",all_characters,wrong_characters );
     	all_characters += strlen(list_of_words -> value);
-    	printf("%d--------%dallchars\n",all_characters ,strlen(list_of_words -> value));
     	wrong_characters += wrong_chars(list_of_words -> value,input);
-    	printf("%d--------wrongchars\n",wrong_characters );
-    	printf("%s-------<>-------%s\n",list_of_words -> value,input );
     }
     if(started == 1)
     {
@@ -793,7 +775,6 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
             	total_t = (int)(end_t - start_t) - (int)(resume_t - pause_t);
             	resume_t = 0;
             	pause_t = 0;
-            	printf("%d\n", total_t);
 
             	levelscore = scorecalculator(total_t,wrong_characters,all_characters);
 
@@ -822,9 +803,11 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
                 strcat(score_to_string,":score");
                 gtk_label_set_text (GTK_LABEL(label5),score_to_string);
 
-
+                if(score_mode == 1)
+                {
+                	levelscore = levelscore / 15;
+                }
                 player_score += levelscore;
-                printf("%f==========%f====scores\n",levelscore,player_score);
                 levelscore = 0;
 
                 gtk_entry_set_text (GTK_ENTRY(entry1),"");
