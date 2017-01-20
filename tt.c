@@ -10,36 +10,36 @@
 struct linkedlist * list_of_words;
 char *player_name;
 char * scoreboard_toshow[10];
-bool started=0;
-bool startchecker =0;
-int wordnum = 0;
-int level_is_passed_or_not[10];
-int level = 1;
-int maxlevel= 1;
-int gameispaused = 0;
-int max_saved_level = 0;
-int current_word_number_on_list = 0;
-int wrong_characters,all_characters;
+bool started=0,startchecker =0;
+int wordnum = 0,level_is_passed_or_not[10],level = 1,maxlevel= 1,gameispaused = 0,max_saved_level = 0,current_word_number_on_list = 0,wrong_characters,all_characters,score_mode = 0;
 float score = 0,levelscore = 0,player_score = 0;
-int score_mode = 0;
 GtkHButtonBox * buttonbox;
 GtkDialog *dialog,*dialog_playername;
 GtkBuilder *builder, *builder_dialog,*builder_dialog_scoreboard,*start_builder;
 GtkWidget *progressbar,*buttonpause,*entry2,*entry,*button11,*button12,*button13,*label1,*label2,*label4,*label5,*label6,*label7,*label8,*label9,*label10,*label11,*label12,*label13,*label14,*label15,*label16,*messagedialog_scoreboard,*statusbar1,*dialog_newlevel,*button1,*button2,*button3,*button4,*button5,*button6,*button7,*button8,*button9,*button10;
 clock_t start_t, end_t, total_t , pause_t =0,resume_t =0;
+
+
+
 // chon nemitonam ro xml bishtar az ye object bedam be eventa baranke dasresi dashte basham global bayad bokonam
 // albate bishtar az ye objectam shayad beshe man chizi peyda nakardam
+
+
 struct linkedlist
 {
     char * value;
     struct linkedlist * next;
 };
+// baraye zakhire kalamate file ha
+
 
 struct scoreboard
 {
     char * name;
     float * score;
 };
+// baraye zakhire esm va emtiaz top 10
+
 
 void structswapper(struct scoreboard * one,struct scoreboard * two)
 {
@@ -51,6 +51,9 @@ void structswapper(struct scoreboard * one,struct scoreboard * two)
     two -> name = tmp.name;
     two -> score = tmp.score;
 }
+// baraye sort kardane structe top 10
+
+
 void addend(struct linkedlist **list,char * word, int length)
 {
     struct linkedlist *current;
@@ -75,6 +78,8 @@ void addend(struct linkedlist **list,char * word, int length)
     list_of_words -> next = NULL;
     strncpy(list_of_words -> value , word, length);
 }
+// baraye ezafe kardan be linkedlist
+
 
 int savedornot(char *esm)
 {
@@ -101,6 +106,7 @@ int savedornot(char *esm)
     fclose(fp);
     return player_highest_lvl;
 }
+// baraye inke agar save bod bishtarin leveli ke rafte bodo bekhonam
 
 
 int save(char *esm,int level)
@@ -131,6 +137,8 @@ int save(char *esm,int level)
     fclose(fp);
     return savedornot(esm);
 }
+//baraye inke bishtarin leveli ke rafte save beshe
+
 
 int levelopener(int a,struct linkedlist ** list_of_words)
 {
@@ -179,6 +187,8 @@ int levelopener(int a,struct linkedlist ** list_of_words)
         free(full_level_file_name);
         return 0;
 }
+// baz kardane level va rikhtane kalamat dar linkedlist
+
 
 void randomshuffle(struct linkedlist **list_of_words,int filenumber)
 {
@@ -207,16 +217,23 @@ void randomshuffle(struct linkedlist **list_of_words,int filenumber)
         current = current -> next;
     }
 }
+//random kardane kalamate linked list
+
 
 void mode_to_wpm (void)
 {
 	score_mode = 1;
 }
+// baraye gozashtane emtiaz dar halate wpm
+
 
 void mode_to_cps(void)
 {
 	score_mode = 0;
 }
+// baraye gozashtane emtiaz dar halate cps
+
+
 float scorecalculator(float time,int wrongchars,int allchars)
 {
 	if(score_mode == 0)
@@ -243,22 +260,10 @@ float scorecalculator(float time,int wrongchars,int allchars)
 		score = ( (allchars - wrongchars) / 5) / (time/60);
 		return (score) ;
 	}
-    
+    return 0;
 }
+// baraye ehtesabe emtiazat
 
-void scoreboard(float score,char * esm)
-{
-    FILE *fp;
-    if (!(fp = fopen("scoreboard.txt", "a+"))) {
-        printf("Failed to open FILE\n");
-        return;
-    }
-    float savedscore;
-    char * names_in_file[10];
-    for(int i = 0; i< 10 ; i++)
-        names_in_file[i] = (char *)malloc(sizeof(char *));
-    
-}
 
 int isinscoreboard(char * esm,float newscore)
 {
@@ -298,6 +303,7 @@ int isinscoreboard(char * esm,float newscore)
         top10[9].score = &newscore;
         top10[9].name = esm;
     }
+    //agar az akharine scoreboard emtiaze fard bishtar bod bejaye akharine scoreboard gharar midaham va scoreboard ra dobare sort mikonam
     for (int j = 0; j < 10; ++j)
     {
         for (int i = 0; i < 9; ++i)
@@ -328,6 +334,8 @@ int isinscoreboard(char * esm,float newscore)
     }
     return 0;
 }
+//baraye didane inke farde jadid dar scoreboard top10 jaye migirad ya na va khandane scoreboard az file
+
 
 void game_pause(void)
 {
@@ -372,6 +380,9 @@ void game_pause(void)
 	} 
 	gtk_widget_hide(button1);
 }
+//gheyre faal kardane dokmeha dar halati ke bazi pause shode va mohasebe zamane pause
+
+
 void game_play(void)
 {
 	system("killall -CONT afplay");
@@ -414,63 +425,72 @@ void game_play(void)
 		gtk_widget_show(button2);	
 	} 
 	gtk_widget_show(button1);
-	// gtk_widget_show(entry);
 }
+//faal kardane dokmeha dar halate resume va mohasebe zamane pause
+
+
 void game_quit(GtkWidget * button12)
 {
 	system("killall afplay");
 	exit(1);
 }
+//khoroj az bazi ba gozine quit
+
 
 void newlevel_showdialog (void)
 {
     gtk_widget_show (GTK_WIDGET(dialog));
 }
+//baraye neshan dadane menuye raftan be levele jadid - baadi
 
-void toupperchanged (char * mainstr,char * str2)
+
+void toupperchanged (char * string_to_be_uppercased,char * word_to_be_typed)
 {
-    int len_main = strlen(mainstr);
-    // char * matched_entry_to_upper = malloc(len_main*sizeof(char));
-    // strncpy(matched_entry_to_upper,mainstr,len_main);
-    int len_current = strlen(str2);
+    int len_main = strlen(string_to_be_uppercased);
+    int len_current = strlen(word_to_be_typed);
     int len_min = len_main > len_current ? len_current : len_main;
     for (int i = 0; i < len_min; ++i)
     {
-        if (mainstr[i] == str2[i])
+        if (string_to_be_uppercased[i] == word_to_be_typed[i])
         {
-            mainstr[i] = toupper(mainstr[i]);
+            string_to_be_uppercased[i] = toupper(string_to_be_uppercased[i]);
         }
     }
 }
+//uppercase kardane kalamate moshabehe kalameye aval ba dovome vorodi
 
-void tolowerchanged (char * str2)
+
+void tolowerchanged (char * word_to_be_lowercased)
 {
-    int len_current = strlen(str2);
+    int len_current = strlen(word_to_be_lowercased);
     for (int i = 0; i < len_current; ++i)
     {
-        str2[i] = tolower(str2[i]);
+        word_to_be_lowercased[i] = tolower(word_to_be_lowercased[i]);
     }
 }
+//lowercase kardane kolle harf haye yek kalame
 
-int wrong_chars (char * mainstr,char * str2)
+
+int wrong_chars (char * word_to_calculate_its_wrong_chars,char * word_to_be_typed)
 {
     int wrongchars_of_input_word = 0;
-    tolowerchanged(str2);
-    tolowerchanged(mainstr);
-    int len_main = strlen(mainstr);
-    int len_current = strlen(str2);
+    tolowerchanged(word_to_be_typed);
+    tolowerchanged(word_to_calculate_its_wrong_chars);
+    int len_main = strlen(word_to_calculate_its_wrong_chars);
+    int len_current = strlen(word_to_be_typed);
     int len_min = len_main > len_current ? len_current : len_main;
     for (int i = 0; i < len_min; ++i)
     {
-        if (mainstr[i] != str2[i])
+        if (word_to_calculate_its_wrong_chars[i] != word_to_be_typed[i])
         {
             wrongchars_of_input_word++;
         }
     }
-    wrongchars_of_input_word = wrongchars_of_input_word + strlen(mainstr) - strlen(str2) ;
+    wrongchars_of_input_word = wrongchars_of_input_word + strlen(word_to_calculate_its_wrong_chars) - strlen(word_to_be_typed) ;
     wrongchars_of_input_word++;
     return wrongchars_of_input_word;
 }
+//baraye mohasebe tedad harfaye ghalat type shode
 
 
 
@@ -481,11 +501,16 @@ void save_clicked(GtkWidget * button12,GtkWidget * label3)
     if(maxlevel == 10) save(player_name,maxlevel);
     gtk_widget_hide(button12);
 }
+//save kardane bazi hengami ke gozine save ra zad
+
+
 void save_clicked_file(GtkWidget * button12,GtkWidget * label3)
 {
     isinscoreboard(player_name,player_score);
     save(player_name,maxlevel);
 }
+//save kardane bazi hengami ke az menu ha save ra entekhab kard
+
 
 void show_dialog_git(void)
 {
@@ -524,15 +549,16 @@ void show_dialog_git(void)
         gtk_widget_hide(GTK_WIDGET(label12));
         gtk_widget_hide(GTK_WIDGET(label13));
         gtk_widget_hide(GTK_WIDGET(label14));
-        gtk_widget_hide(GTK_WIDGET(label15));
-        gtk_label_set_text(GTK_LABEL(label16),"Source code is available at:  https://github.com/Gold3nFox/Typing-speed-test.git");
-       
+        gtk_label_set_text(GTK_LABEL(label15),"Source code is available at:  https://github.com/Gold3nFox/Typing-speed-test.git");
+       	gtk_label_set_text(GTK_LABEL(label16)," ");
 
 
 
         gtk_dialog_run (GTK_DIALOG (messagedialog_scoreboard));
         g_object_unref(G_OBJECT(builder_dialog_scoreboard));
 }
+//baraye namayeshe moshakhasat vaghti az menu ha about entekhab shod
+
 
 void show_dialog_scoreboard(void)
 {
@@ -578,6 +604,9 @@ void show_dialog_scoreboard(void)
         gtk_dialog_run (GTK_DIALOG (messagedialog_scoreboard));
         g_object_unref(G_OBJECT(builder_dialog_scoreboard));
 }
+//baraye namayeshe scoreboard
+
+
 void start_clicked(GtkWidget * button11,GtkWidget * label3)
 {
 	gtk_progress_bar_set_fraction (progressbar,0);
@@ -649,11 +678,15 @@ void start_clicked(GtkWidget * button11,GtkWidget * label3)
         show_dialog_scoreboard();
     }
 }
+//shoroe levele badi vaghti start ra zad
+
 
 void scoreboard_close (void)
 {
 	gtk_widget_destroy(GTK_WIDGET(messagedialog_scoreboard));
 }
+//baste shodane scoreboard ba click bar roye dokme close
+
 
 void game_start(void)
 {
@@ -671,9 +704,10 @@ void game_start(void)
 
 
     gtk_widget_show (GTK_WIDGET(dialog_playername));
-
-
 }
+//neshan dadane peyghame gereftane esm dar ebtedae bazi
+
+
 void locked_level_disabler(void)
 {
 	char * button_name;
@@ -726,6 +760,9 @@ void locked_level_disabler(void)
 		gtk_widget_hide(button2);	
 	} 
 }
+//hide kardane level hayi ke hanoz baz nashode baraye bazikon
+
+
 void name_clicked (GtkWidget * button13 , GtkWidget * entry2)
 {
 	gtk_progress_bar_set_fraction (progressbar,0);
@@ -747,8 +784,9 @@ void name_clicked (GtkWidget * button13 , GtkWidget * entry2)
     sprintf(loaded_level_number,"%d",max_saved_level);
     strcat(loaded_level_name,loaded_level_number);
     gtk_label_set_text (GTK_LABEL(label1),loaded_level_name);
-
 }
+//baraye zakhire esme bazikon va agar ghablan save karde bod levele save shode baraye on load shavad
+
 
 void text_changed(GtkWidget *entry1, GtkWidget *label3){
     char *score_to_string;
@@ -849,6 +887,9 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
     gtk_label_set_text (GTK_LABEL(label3),matched_entry_to_upper);
 
 }
+//harbar kalamei dakhele textbox avaz shavad in tabe ejra mishavad va baraye khandan va ejrae amaliate bazi roye kalamate vorodi nesbat be kalamate file ha ast
+
+
 void level1_clicked (GtkWidget *button1,GtkWidget *entry1)
 {
 	gtk_progress_bar_set_fraction (progressbar,0);
@@ -875,6 +916,8 @@ void level1_released (GtkWidget *button1,GtkWidget *label1)
 {   
     gtk_label_set_text (GTK_LABEL(label1),"Level 1");
 }
+
+
 void level2_clicked (GtkWidget *button2,GtkWidget *entry1)
 {
 	gtk_progress_bar_set_fraction (progressbar,0);
@@ -901,6 +944,8 @@ void level2_released (GtkWidget *button2,GtkWidget *label1)
 {   
     gtk_label_set_text (GTK_LABEL(label1),"Level 2");
 }
+
+
 void level3_clicked (GtkWidget *button3,GtkWidget *entry1)
 {
 	gtk_progress_bar_set_fraction (progressbar,0);
@@ -927,6 +972,8 @@ void level3_released (GtkWidget *button3,GtkWidget *label1)
 {   
     gtk_label_set_text (GTK_LABEL(label1),"Level 3");
 }
+
+
 void level4_clicked (GtkWidget *button4,GtkWidget *entry1)
 {
 	gtk_progress_bar_set_fraction (progressbar,0);
@@ -953,6 +1000,8 @@ void level4_released (GtkWidget *button4,GtkWidget *label1)
 {   
     gtk_label_set_text (GTK_LABEL(label1),"Level 4");
 }
+
+
 void level5_clicked (GtkWidget *button5,GtkWidget *entry1)
 {
 	gtk_progress_bar_set_fraction (progressbar,0);
@@ -979,6 +1028,8 @@ void level5_released (GtkWidget *button5,GtkWidget *label1)
 {   
     gtk_label_set_text (GTK_LABEL(label1),"Level 5");
 }
+
+
 void level6_clicked (GtkWidget *button6,GtkWidget *entry1)
 {
 	gtk_progress_bar_set_fraction (progressbar,0);
@@ -1005,6 +1056,8 @@ void level6_released (GtkWidget *button6,GtkWidget *label1)
 {   
     gtk_label_set_text (GTK_LABEL(label1),"Level 6");
 }
+
+
 void level7_clicked (GtkWidget *button7,GtkWidget *entry1)
 {
 	gtk_progress_bar_set_fraction (progressbar,0);
@@ -1031,6 +1084,8 @@ void level7_released (GtkWidget *button7,GtkWidget *label1)
 {   
     gtk_label_set_text (GTK_LABEL(label1),"Level 7");
 }
+
+
 void level8_clicked (GtkWidget *button8,GtkWidget *entry1)
 {
 	gtk_progress_bar_set_fraction (progressbar,0);
@@ -1057,6 +1112,8 @@ void level8_released (GtkWidget *button8,GtkWidget *label1)
 {   
     gtk_label_set_text (GTK_LABEL(label1),"Level 8");
 }
+
+
 void level9_clicked (GtkWidget *button9,GtkWidget *entry1)
 {
 	gtk_progress_bar_set_fraction (progressbar,0);
@@ -1083,6 +1140,8 @@ void level9_released (GtkWidget *button9,GtkWidget *label1)
 {   
     gtk_label_set_text (GTK_LABEL(label1),"Level 9");
 }
+
+
 void level10_clicked (GtkWidget *button10,GtkWidget *entry1)
 {
 	gtk_progress_bar_set_fraction (progressbar,0);
@@ -1110,10 +1169,15 @@ void level10_released (GtkWidget *button10,GtkWidget *label1)
 {   
     gtk_label_set_text (GTK_LABEL(label1),"Level 10");
 }
+
+
 void dialog_closer (void)
 {
     gtk_widget_destroy (GTK_WIDGET(dialog));
 }
+//baste shodane menuye raftan be levele badi bad az start
+
+
 int main (int argc, char *argv[])
 {
 	system("afplay farhad.mp3 &");
@@ -1124,14 +1188,17 @@ int main (int argc, char *argv[])
     gtk_init (&argc, &argv);
     builder = gtk_builder_new ();
     builder_dialog = gtk_builder_new ();
+    
     // GError *err = NULL;  baraye printe errore builder NULL e payin ba &err jabeja she
 
     gtk_builder_add_from_file (builder, "GUI.glade", NULL);
+
     // if (err){
     //     g_print(err->message);
     //     printf("%s\n", err);      Baraye moshahede daghighe error uncomment she
     //     return 1;
     // }
+    
     window = GTK_WIDGET(gtk_builder_get_object(builder,"window_main"));
     button1 = GTK_WIDGET(gtk_builder_get_object(builder,"button1"));
     button2 = GTK_WIDGET(gtk_builder_get_object(builder,"button2"));
@@ -1176,7 +1243,6 @@ int main (int argc, char *argv[])
     gtk_builder_connect_signals(builder,"menuitem4");
 
 
-    
     g_object_unref(G_OBJECT(builder));
     gtk_widget_show(GTK_WIDGET(window));
     game_start();

@@ -358,7 +358,7 @@
   </object>
   <object class="GtkWindow" id="window_main">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">test</property>
+    <property name="title" translatable="yes">TYPING-RACE</property>
     <property name="resizable">False</property>
     <child>
       <object class="GtkVBox" id="vbox1">
