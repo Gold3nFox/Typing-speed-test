@@ -18,13 +18,14 @@ int all_chars = 0;
 int word_wrong_chars = 0;
 int level = 1;
 int maxlevel= 1;
+int gameispaused = 0;
 int max_saved_level = 0;
 float score = 0,levelscore = 0,player_score = 0;
 GtkHButtonBox * buttonbox;
 GtkDialog *dialog,*dialog_playername;
 GtkBuilder *builder, *builder_dialog,*builder_dialog_scoreboard,*start_builder;
-GtkWidget *entry2,*button11,*button12,*button13,*label1,*label2,*label4,*label5,*label6,*label7,*label8,*label9,*label10,*label11,*label12,*label13,*label14,*label15,*label16,*messagedialog_scoreboard,*statusbar1,*dialog_newlevel,*button1,*button2,*button3,*button4,*button5,*button6,*button7,*button8,*button9,*button10;
-clock_t start_t, end_t, total_t;
+GtkWidget *buttonpause,*entry2,*entry,*button11,*button12,*button13,*label1,*label2,*label4,*label5,*label6,*label7,*label8,*label9,*label10,*label11,*label12,*label13,*label14,*label15,*label16,*messagedialog_scoreboard,*statusbar1,*dialog_newlevel,*button1,*button2,*button3,*button4,*button5,*button6,*button7,*button8,*button9,*button10;
+clock_t start_t, end_t, total_t , pause_t =0,resume_t =0;
 // chon nemitonam ro xml bishtar az ye object bedam be eventa baranke dasresi dashte basham global bayad bokonam
 // albate bishtar az ye objectam shayad beshe man chizi peyda nakardam
 struct linkedlist
@@ -212,7 +213,17 @@ void randomshuffle(struct linkedlist **list_of_words,int filenumber)
 
 float scorecalculator(float time,int wrongchars,int allchars)
 {
-    if(time < 1) time = 1;
+    if(time < 1 && gameispaused == 0)
+    {
+    	allchars = 0;
+    	wrongchars = 0;
+    }
+    if (allchars == wrongchars)
+    {
+    	allchars = 0;
+    	wrongchars = 0;
+    }
+    if(gameispaused == 1) time = -1;
     score += (3 * allchars - wrongchars ) / time;
     printf("%f :time %d :wrongword %d :allwords\n",time,wrongchars,allchars );
     return (score) ;
@@ -302,13 +313,99 @@ int isinscoreboard(char * esm,float newscore)
     return 0;
 }
 
+void game_pause(void)
+{
+	gameispaused = 1;
+	ftime(&pause_t);
+	if(max_saved_level > 9)
+	{
+		gtk_widget_hide(button10);
+	}
+	if(max_saved_level > 8)
+	{
+		gtk_widget_hide(button8);	
+	} 
+	if(max_saved_level > 7)
+	{
+		gtk_widget_hide(button7);	
+	} 
+	if(max_saved_level > 6)
+	{
+		gtk_widget_hide(button9);	
+	} 
+	if(max_saved_level > 5) 
+	{
+		gtk_widget_hide(button6);
+	}
+	if(max_saved_level > 4)
+	{
+		gtk_widget_hide(button4);	
+	} 
+	if(max_saved_level > 3)
+	{
+		gtk_widget_hide(button5);
+	} 
+	if(max_saved_level > 2)
+	{
+		gtk_widget_hide(button3);	
+	} 
+	if(max_saved_level > 1)
+	{
+		gtk_widget_hide(button2);	
+	} 
+	gtk_widget_hide(button1);
+	// gtk_widget_hide(entry);
+}
+void game_play(void)
+{
+	gameispaused = 0;
+	ftime(&resume_t);
+	if(max_saved_level > 9)
+	{
+		gtk_widget_show(button10);
+	}
+	if(max_saved_level > 8)
+	{
+		gtk_widget_show(button8);	
+	} 
+	if(max_saved_level > 7)
+	{
+		gtk_widget_show(button7);	
+	} 
+	if(max_saved_level > 6)
+	{
+		gtk_widget_show(button9);	
+	} 
+	if(max_saved_level > 5) 
+	{
+		gtk_widget_show(button6);
+	}
+	if(max_saved_level > 4)
+	{
+		gtk_widget_show(button4);	
+	} 
+	if(max_saved_level > 3)
+	{
+		gtk_widget_show(button5);
+	} 
+	if(max_saved_level > 2)
+	{
+		gtk_widget_show(button3);	
+	} 
+	if(max_saved_level > 1)
+	{
+		gtk_widget_show(button2);	
+	} 
+	gtk_widget_show(button1);
+	// gtk_widget_show(entry);
+}
 void game_quit(GtkWidget * button12)
 {
 	exit(1);
 }
 void game_about(GtkWidget * button12)
 {
-	printf("Heres game address on github%s\n","https://github.com/Gold3nFox/Typing-speed-test.git" );
+	printf("Heres game address on github: %s\n","https://github.com/Gold3nFox/Typing-speed-test.git" );
 }
 void newlevel_showdialog (void)
 {
@@ -601,17 +698,20 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
         started = 1;
     }else if(input[strlen(input)-1] == ' ')
     {
-                tolowerchanged(labelvalue);
-                printf("------%s====\n",input );
-                word_wrong_chars = wrong_chars(labelvalue,input);
-                printf("%dkkkkkakksdkaskdaksd\n",word_wrong_chars );
-                all_chars = strlen(labelvalue);
-                printf("%dOooooooooOooo\n", all_chars);
-                ftime(&end_t);
-                printf("%lf:ending time\n",(double)(end_t ));
-                total_t = (double)(end_t - start_t);
-                levelscore += scorecalculator(total_t,word_wrong_chars,all_chars);
-                ftime(&start_t);
+       	resume_t = 0;
+    	pause_t = 0;
+        tolowerchanged(labelvalue);
+        printf("------%s====\n",input );
+        word_wrong_chars = wrong_chars(labelvalue,input);
+        printf("%dkkkkkakksdkaskdaksd\n",word_wrong_chars );
+        all_chars = strlen(labelvalue);
+        printf("%dOooooooooOooo\n", all_chars);
+		ftime(&end_t);
+		printf("%lf:ending time\n",(double)(end_t ));
+		total_t = (double)(end_t - start_t) - (double)(resume_t - pause_t);
+		printf("%d----------00000\n", gameispaused);
+		levelscore += scorecalculator(total_t,word_wrong_chars,all_chars);
+        ftime(&start_t);
     }
     if(started == 1)
     {
@@ -638,7 +738,7 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
                 dialog = GTK_DIALOG(gtk_builder_get_object(builder_dialog,"dialog_newlevel"));
                 gtk_builder_connect_signals(builder_dialog,"dialog_newlevel");   
                 printf("%f>>>>>>>>>\n", levelscore);
-                levelscore = levelscore / wordnum;
+                // levelscore = levelscore / wordnum;
                 printf("%d------------------\n",wordnum );
                 score_to_string = malloc(13*sizeof(char));
                 sprintf(score_to_string,"%.3f",levelscore);
@@ -937,7 +1037,7 @@ int main (int argc, char *argv[])
     srand(time(NULL));
     list_of_words = NULL;
     isinscoreboard("behnam", -300000);
-    GtkWidget *window,*menubar,*menuitem1,*menuitem2,*menuitem3,*menuitem4,*label3,*progressbar,*entry;
+    GtkWidget *window,*menubar,*menuitem1,*menuitem2,*menuitem3,*menuitem4,*label3,*progressbar;
     gtk_init (&argc, &argv);
     builder = gtk_builder_new ();
     builder_dialog = gtk_builder_new ();
@@ -991,6 +1091,7 @@ int main (int argc, char *argv[])
     gtk_builder_connect_signals(builder,"menuitem2");
     gtk_builder_connect_signals(builder,"menuitem3");
     gtk_builder_connect_signals(builder,"menuitem4");
+
 
     
     g_object_unref(G_OBJECT(builder));
