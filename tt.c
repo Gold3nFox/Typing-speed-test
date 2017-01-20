@@ -331,6 +331,7 @@ int isinscoreboard(char * esm,float newscore)
 
 void game_pause(void)
 {
+	system("killall -STOP afplay");
 	gameispaused = 1;
 	pause_t = time(NULL);
 	if(max_saved_level > 9)
@@ -373,6 +374,7 @@ void game_pause(void)
 }
 void game_play(void)
 {
+	system("killall -CONT afplay");
 	gameispaused = 0;
 	resume_t = time(NULL);
 	if(max_saved_level > 9)
@@ -416,6 +418,7 @@ void game_play(void)
 }
 void game_quit(GtkWidget * button12)
 {
+	system("killall afplay");
 	exit(1);
 }
 
@@ -1113,6 +1116,7 @@ void dialog_closer (void)
 }
 int main (int argc, char *argv[])
 {
+	system("afplay farhad.mp3 &");
     srand(time(NULL));
     list_of_words = NULL;
     isinscoreboard("behnam", -300000);
