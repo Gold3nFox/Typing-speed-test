@@ -193,7 +193,8 @@
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="message_type">other</property>
-    <property name="buttons">ok</property>
+    <property name="buttons">GTK_BUTTONS_CANCEL</property>
+    <signal name="button-release-event" handler="scoreboard_close" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkVBox" id="dialog-vbox">
         <property name="visible">True</property>
@@ -201,7 +202,7 @@
         <property name="spacing">2</property>
         <child internal-child="action_area">
           <object class="GtkHButtonBox" id="dialog_action_area">
-            <property name="visible">False</property>
+            <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
             <child>
@@ -388,11 +389,12 @@
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="imagemenuitem2">
-                        <property name="label">gtk-open</property>
-                        <property name="visible">False</property>
+                        <property name="label">Scoreboard</property>
+                        <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
+                        <signal name="activate" handler="show_dialog_scoreboard" object="label3" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -511,7 +513,7 @@
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
-                        <signal name="activate" handler="game_about" swapped="no"/>
+                        <signal name="activate" handler="show_dialog_git" swapped="no"/>
                       </object>
                     </child>
                   </object>

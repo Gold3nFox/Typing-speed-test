@@ -14,12 +14,11 @@ bool started=0;
 bool startchecker =0;
 int wordnum = 0;
 int level_is_passed_or_not[10];
-int all_chars = 0;
-int word_wrong_chars = 0;
 int level = 1;
 int maxlevel= 1;
 int gameispaused = 0;
 int max_saved_level = 0;
+int wrong_characters,all_characters;
 float score = 0,levelscore = 0,player_score = 0;
 GtkHButtonBox * buttonbox;
 GtkDialog *dialog,*dialog_playername;
@@ -215,16 +214,13 @@ float scorecalculator(float time,int wrongchars,int allchars)
 {
     if(time < 1 && gameispaused == 0)
     {
-    	allchars = 0;
     	wrongchars = 0;
-    }
-    if (allchars == wrongchars)
-    {
     	allchars = 0;
-    	wrongchars = 0;
+    	//age kasi kolle levelo zire 1sanie bere hackere :|
     }
-    if(gameispaused == 1) time = -1;
-    score += (3 * allchars - wrongchars ) / time;
+    if(gameispaused == 1) time = -1; // age to pause kalame benevisi harchi emtiaz begiri az emtiaz kollet kam mishe :)
+    printf("%d----------------------------------000-0-0-0-0\n",time );
+    score = (allchars - wrongchars ) / time;
     printf("%f :time %d :wrongword %d :allwords\n",time,wrongchars,allchars );
     return (score) ;
 }
@@ -316,7 +312,7 @@ int isinscoreboard(char * esm,float newscore)
 void game_pause(void)
 {
 	gameispaused = 1;
-	ftime(&pause_t);
+	pause_t = time(NULL);
 	if(max_saved_level > 9)
 	{
 		gtk_widget_hide(button10);
@@ -354,12 +350,15 @@ void game_pause(void)
 		gtk_widget_hide(button2);	
 	} 
 	gtk_widget_hide(button1);
+	printf("%d.......%d\n",all_characters,wrong_characters );
 	// gtk_widget_hide(entry);
 }
 void game_play(void)
 {
 	gameispaused = 0;
-	ftime(&resume_t);
+	printf("%d.......%d\n",all_characters,wrong_characters );
+	resume_t = time(NULL);
+	printf("%d...2....%d\n",all_characters,wrong_characters );
 	if(max_saved_level > 9)
 	{
 		gtk_widget_show(button10);
@@ -428,29 +427,6 @@ void toupperchanged (char * mainstr,char * str2)
     }
 }
 
-int wrong_chars (char * mainstr,char * str2)
-{
-    int wrongchars = 0;
-    int len_main = strlen(mainstr);
-    // char * matched_entry_to_upper = malloc(len_main*sizeof(char));
-    // strncpy(matched_entry_to_upper,mainstr,len_main);
-    int len_current = strlen(str2);
-    int len_min = len_main > len_current ? len_current : len_main;
-    for (int i = 0; i < len_min; ++i)
-    {
-        if (mainstr[i] != str2[i] && str2[i] != ' ' && strcmp(mainstr," ") != 0)
-        {
-            wrongchars++;
-            printf("%s=========%s---->%d\n",mainstr,str2,wrongchars );
-        }
-    }
-    wrongchars = wrongchars + strlen(mainstr) - strlen(str2) ;
-    printf("%d.......\n",wrongchars );
-    wrongchars++;
-    printf("%d-------------\n",wrongchars );
-    return wrongchars;
-}
-
 void tolowerchanged (char * str2)
 {
     int len_current = strlen(str2);
@@ -459,6 +435,33 @@ void tolowerchanged (char * str2)
         str2[i] = tolower(str2[i]);
     }
 }
+
+int wrong_chars (char * mainstr,char * str2)
+{
+    int wrongchars_of_input_word = 0;
+    tolowerchanged(str2);
+    tolowerchanged(mainstr);
+    printf("%s ,,,,,, %s\n",mainstr,str2 );
+    int len_main = strlen(mainstr);
+    int len_current = strlen(str2);
+    int len_min = len_main > len_current ? len_current : len_main;
+    for (int i = 0; i < len_min; ++i)
+    {
+        if (mainstr[i] != str2[i])
+        {
+            wrongchars_of_input_word++;
+        }
+    }
+    if(strcmp(str2," ") == 0) wrongchars_of_input_word --;
+    printf("%d wrong chars of in put word\n",wrongchars_of_input_word );
+    wrongchars_of_input_word = wrongchars_of_input_word + strlen(mainstr) - strlen(str2) ;
+    printf("%d wrong chars of in put word\n",wrongchars_of_input_word );
+    wrongchars_of_input_word++;
+    printf("%d wrong chars of in put word\n",wrongchars_of_input_word );
+    return wrongchars_of_input_word;
+}
+
+
 
 void save_clicked(GtkWidget * button12,GtkWidget * label3)
 {
@@ -474,6 +477,54 @@ void save_clicked_file(GtkWidget * button12,GtkWidget * label3)
     printf("%d------------>>>\n", maxlevel);
     save(player_name,maxlevel);
 }
+
+void show_dialog_git(void)
+{
+	builder_dialog_scoreboard = gtk_builder_new();
+        gtk_builder_add_from_file (builder_dialog_scoreboard, "GUI.glade" , NULL);
+        label7 = GTK_WIDGET(gtk_builder_get_object(builder_dialog_scoreboard,"label7"));
+        gtk_builder_connect_signals(builder_dialog_scoreboard,"label7");
+        label8 = GTK_WIDGET(gtk_builder_get_object(builder_dialog_scoreboard,"label8"));
+        gtk_builder_connect_signals(builder_dialog_scoreboard,"label8");
+        label9 = GTK_WIDGET(gtk_builder_get_object(builder_dialog_scoreboard,"label9"));
+        gtk_builder_connect_signals(builder_dialog_scoreboard,"label9");
+        label10 = GTK_WIDGET(gtk_builder_get_object(builder_dialog_scoreboard,"label10"));
+        gtk_builder_connect_signals(builder_dialog_scoreboard,"label10");
+        label11 = GTK_WIDGET(gtk_builder_get_object(builder_dialog_scoreboard,"label11"));
+        gtk_builder_connect_signals(builder_dialog_scoreboard,"label11");
+        label12 = GTK_WIDGET(gtk_builder_get_object(builder_dialog_scoreboard,"label12"));
+        gtk_builder_connect_signals(builder_dialog_scoreboard,"label12");
+        label13 = GTK_WIDGET(gtk_builder_get_object(builder_dialog_scoreboard,"label13"));
+        gtk_builder_connect_signals(builder_dialog_scoreboard,"label13");
+        label14 = GTK_WIDGET(gtk_builder_get_object(builder_dialog_scoreboard,"label14"));
+        gtk_builder_connect_signals(builder_dialog_scoreboard,"label14");
+        label15 = GTK_WIDGET(gtk_builder_get_object(builder_dialog_scoreboard,"label15"));
+        gtk_builder_connect_signals(builder_dialog_scoreboard,"label15");
+        label16 = GTK_WIDGET(gtk_builder_get_object(builder_dialog_scoreboard,"label16"));
+        gtk_builder_connect_signals(builder_dialog_scoreboard,"label16");
+        messagedialog_scoreboard = GTK_WIDGET(gtk_builder_get_object(builder_dialog_scoreboard,"messagedialog_scoreboard"));
+        gtk_builder_connect_signals(builder_dialog_scoreboard,"messagedialog_scoreboard");
+
+
+
+        gtk_label_set_text(GTK_LABEL(label7),"This game is performed by BehnamAminazad");
+        gtk_widget_hide(GTK_WIDGET(label8));
+        gtk_widget_hide(GTK_WIDGET(label9));
+        gtk_widget_hide(GTK_WIDGET(label10));
+        gtk_widget_hide(GTK_WIDGET(label11));
+        gtk_widget_hide(GTK_WIDGET(label12));
+        gtk_widget_hide(GTK_WIDGET(label13));
+        gtk_widget_hide(GTK_WIDGET(label14));
+        gtk_widget_hide(GTK_WIDGET(label15));
+        gtk_label_set_text(GTK_LABEL(label16),"Source code is available at:  https://github.com/Gold3nFox/Typing-speed-test.git");
+       
+
+
+
+        gtk_dialog_run (GTK_DIALOG (messagedialog_scoreboard));
+        g_object_unref(G_OBJECT(builder_dialog_scoreboard));
+}
+
 void show_dialog_scoreboard(void)
 {
     gtk_widget_destroy(GTK_WIDGET(dialog));
@@ -586,6 +637,11 @@ void start_clicked(GtkWidget * button11,GtkWidget * label3)
     }
 }
 
+void scoreboard_close (void)
+{
+	gtk_widget_destroy(GTK_WIDGET(messagedialog_scoreboard));
+}
+
 void game_start(void)
 {
 	start_builder = gtk_builder_new();
@@ -682,10 +738,10 @@ void name_clicked (GtkWidget * button13 , GtkWidget * entry2)
 }
 
 void text_changed(GtkWidget *entry1, GtkWidget *label3){
+	printf("%d.....32323..%d\n",all_characters,wrong_characters );
     char *score_to_string;
     gchar * input;
     gchar * labelvalue;
-    char *emptystring;
     input = (gchar *)(gtk_entry_get_text (GTK_ENTRY(entry1)));
     labelvalue = (gchar *)(gtk_label_get_text (GTK_LABEL(label3)));
     int len_main = strlen(list_of_words -> value);
@@ -693,25 +749,38 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
     char * matched_entry_to_upper = malloc(strlen(labelvalue)*sizeof(char));
     if(strcmp(input,"start ") == 0)
     {
-        ftime(&start_t);
-        printf("%lf:starting time\n",(double)(start_t ));
+    	resume_t = 0;
+		pause_t = 0;
+    	wrong_characters = 0;
+    	all_characters = 0;
+        start_t = time(NULL);
         started = 1;
     }else if(input[strlen(input)-1] == ' ')
     {
-       	resume_t = 0;
-    	pause_t = 0;
-        tolowerchanged(labelvalue);
-        printf("------%s====\n",input );
-        word_wrong_chars = wrong_chars(labelvalue,input);
-        printf("%dkkkkkakksdkaskdaksd\n",word_wrong_chars );
-        all_chars = strlen(labelvalue);
-        printf("%dOooooooooOooo\n", all_chars);
-		ftime(&end_t);
-		printf("%lf:ending time\n",(double)(end_t ));
-		total_t = (double)(end_t - start_t) - (double)(resume_t - pause_t);
-		printf("%d----------00000\n", gameispaused);
-		levelscore += scorecalculator(total_t,word_wrong_chars,all_chars);
-        ftime(&start_t);
+  //      	resume_t = 0;
+  //   	pause_t = 0;
+  //       tolowerchanged(labelvalue);
+  //       printf("------%s====\n",input );
+  //       word_wrong_chars = wrong_chars(labelvalue,input);
+  //       printf("%dkkkkkakksdkaskdaksd\n",word_wrong_chars );
+  //       all_chars = strlen(labelvalue);
+  //       printf("%dOooooooooOooo\n", all_chars);
+		// ftime(&end_t);
+		// printf("%lf:ending time\n",(double)(end_t ));
+		// total_t = (double)(end_t - start_t) - (double)(resume_t - pause_t);
+		// printf("%d----------00000\n", gameispaused);
+		// levelscore += scorecalculator(total_t,word_wrong_chars,all_chars);
+  //       ftime(&start_t);
+
+
+
+
+    	printf("%d.......%d\n",all_characters,wrong_characters );
+    	all_characters += strlen(list_of_words -> value);
+    	printf("%d--------%dallchars\n",all_characters ,strlen(list_of_words -> value));
+    	wrong_characters += wrong_chars(list_of_words -> value,input);
+    	printf("%d--------wrongchars\n",wrong_characters );
+    	printf("%s-------<>-------%s\n",list_of_words -> value,input );
     }
     if(started == 1)
     {
@@ -719,8 +788,16 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
         {
             if (list_of_words -> next == NULL )
             {
-                word_wrong_chars = 0;
-                all_chars = 0;
+            	end_t = time(NULL);
+            	total_t = (int)(end_t - start_t) - (int)(resume_t - pause_t);
+            	resume_t = 0;
+            	pause_t = 0;
+            	printf("%d\n", total_t);
+
+            	levelscore = scorecalculator(total_t,wrong_characters,all_characters);
+
+
+
                 started = 0;
                 builder_dialog = gtk_builder_new();
                 gtk_builder_add_from_file (builder_dialog, "GUI.glade" , NULL);
@@ -737,11 +814,10 @@ void text_changed(GtkWidget *entry1, GtkWidget *label3){
                 gtk_builder_connect_signals(builder_dialog,"statusbar1");
                 dialog = GTK_DIALOG(gtk_builder_get_object(builder_dialog,"dialog_newlevel"));
                 gtk_builder_connect_signals(builder_dialog,"dialog_newlevel");   
-                printf("%f>>>>>>>>>\n", levelscore);
-                // levelscore = levelscore / wordnum;
-                printf("%d------------------\n",wordnum );
+               
+
                 score_to_string = malloc(13*sizeof(char));
-                sprintf(score_to_string,"%.3f",levelscore);
+                sprintf(score_to_string,"%.1f",levelscore);
                 strcat(score_to_string,":score");
                 gtk_label_set_text (GTK_LABEL(label5),score_to_string);
 
