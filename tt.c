@@ -624,6 +624,7 @@ void start_clicked(GtkWidget * button11,GtkWidget * label3)
         	gtk_widget_show_all (button10);	
         } 
         level++;
+        max_saved_level++;
         current_level = (char *)malloc(8*sizeof(char));
         level_number = (char *)malloc(2*sizeof(char));
         strcpy(current_level,"Level ");
